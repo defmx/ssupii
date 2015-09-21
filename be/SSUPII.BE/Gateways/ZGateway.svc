@@ -1,1 +1,0 @@
-﻿<%@ ServiceHost Language="C#" Debug="true" Service="SSUPII.BE.Service1" CodeBehind="ZGateway.svc.cs" %>
