@@ -118,6 +118,7 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
+    <Folder Include="w\" />
   </ItemGroup>
   <ItemGroup>
     <None Include="Properties\PublishProfiles\ssupii.pubxml" />
