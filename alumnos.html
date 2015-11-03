@@ -4,9 +4,9 @@
 	html5up.net | @n33co
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 -->
-<html>
+<html ng-app="upii">
 	<head>
-		<title>Alumnos</title>
+		<title>Alumnos de nuevo ingreso</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
@@ -36,13 +36,13 @@
 					</div>
 				</div>
 			</div>
-			<div id="main">
+			<div id="main" ng-controller="CTRL as ctrl">
 				<div class="container">
 					<div class="row main-row">
 						<div class="8u 12u(mobile)">
 
 							<section class="left-content">
-								<h2>Listado de alumnos por semestre ( 14-2 )</h2>
+                                <h2 ng-src="{{currSem}}">Alumnos de nuevo ingreso por semestre </h2> <h3 style="display:inline">( {{currSem}} )</h3>
 								<p></p>
 							</section>
 
@@ -52,8 +52,8 @@
 							<section>
 								<h2>Semestres</h2>
 								<ul class="small-image-list">
-									<li>
-										<h2 style="display:inline">14 - 2 </h2><h5 style="display:inline">(300)</h5>
+									<li ng-repeat="s in data2.sem">
+                                        <a href=""><h3 style="display:inline" ng-click="ctrl.semOnClick(s.year,s.sem)">{{s.year}} - {{s.sem}} </h3></a><h5 style="display:inline">{{s.count}}</h5>
 									</li>
 								</ul>
 							</section>
@@ -132,7 +132,8 @@
 			<script src="assets/js/util.js"></script>
 			<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
 			<script src="assets/js/main.js"></script>
-	<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script> 
+            <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.3.15/angular.min.js"></script>
+            <script src="assets/js/upiifx.js"></script>
 
 	</body>
 </html>
