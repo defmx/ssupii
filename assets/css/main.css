@@ -1786,3 +1786,21 @@
 			}
 
 	}
+	
+	.wait-gif {
+		width:35px;
+		height:35px;
+	}
+	
+	#logo-array {
+		list-style-type:none;
+	}
+	
+	#logo-array ul li {
+		display:inline;
+	}
+	
+	#upiitalogo{
+		width:100px;
+		height:65	px;
+	}
