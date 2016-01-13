@@ -4,11 +4,9 @@
 			var ctrl=this;
 			$scope.title="";
 			$scope.currSem="14 - 2";
-			$http.get('http://ssupii.azurewebsites.net/z/ls?q=sch').
+			$http.get('http://ss.localhost:82/rest/api.php?r=sas&n=b').
 			success(function(data, status, headers, config) {
-					 data='{"a":"a","sch":'+data+'}';
-					 var a=JSON.parse(data);
-					 $scope.data1=a;
+					 $scope.data1=data;
 					 $('#wait2').hide();
 					 }).
 			error(function(data, status, headers, config) {

@@ -24,7 +24,7 @@
 								<div id="logo-array">
 									<ul>
 										<li><img id="upiitalogo" src="images/logo.png"/></li>
-										<li><h1><a href="#" id="logo">Upiita</a></h1></li>
+										<li><h1><a href="#" id="logo"></a></h1></li>
 									</ul>
 								</div>
                                 <nav id="nav">
@@ -50,7 +50,7 @@
 								<div class="wait-div"><img style="display:none" class="wait-gif" id="wait1" src="images/loading_spinner.gif"/></div>
                                 <ul class="small-image-list">
                                     <li ng-repeat="s in data3.alumn">
-                                        <h3 style="display:inline">{{'['+s.boleta+']'+' '+s.nombres+' '+s.apellido_p+' ' +s.apellido_m}}</h3>
+                                        <h4 style="display:inline">{{'['+s.boleta+']'+' '+s.nombres+' '+s.apellido_p+' ' +s.apellido_m}}</h4>
                                     </li>
                                 </ul>
 							</section>
@@ -62,8 +62,8 @@
 								<h2>Becas</h2>
 								<div class="wait-div"><img class="wait-gif" id="wait2" src="images/loading_spinner.gif"/></div>
 								<ul class="small-image-list">
-									<li ng-repeat="s in data1.sch">
-										<a href=""><h3 style="display:inline" ng-click="ctrl.bOnClick(s.id,s.name)">{{s.name+' '}}</h3></a><h5 style="display:inline">({{0.00}})</h5>
+									<li ng-repeat="s in data1.data">
+										<a href=""><h3 style="display:inline" ng-click="ctrl.bOnClick(s._id,s.nom)">{{s.nom+' '}}</h3></a><h5 style="display:inline">({{s.count}})</h5>
 									</li>
 								</ul>
 							</section>
