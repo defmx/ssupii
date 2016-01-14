@@ -1,48 +1,50 @@
  (function(){
   var dz=angular.module('upii',[]);
+  var endpoint="http://ss.localhost:82/rest/api.php";
   dz.controller('CTRL', ['$scope','$http', function($scope,$http){
 			var ctrl=this;
 			$scope.title="";
-			$scope.currSem="14 - 2";
-			$http.get('http://ss.localhost:82/rest/api.php?r=sas&n=b').
+			$scope.currSem="Seleccionar";
+			$http.get(endpoint+'?r=sas&n=a').
 			success(function(data, status, headers, config) {
-					 $scope.data1=data;
-					 $('#wait2').hide();
-					 }).
+					$scope.data1=data;
+					$('#wait2').hide();
+					}).
 			error(function(data, status, headers, config) {
 				   });
-			$http.get('http://ssupii.azurewebsites.net/z/ls?q=sem').
+			$http.get(endpoint+'?r=sas&n=b').
 			success(function(data, status, headers, config) {
-					 data='{"a":"a","sem":'+data+'}';
-					 var a=JSON.parse(data);
-					 $scope.data2=a;
-					 $('#wait2').hide();
-					 }).
+					$scope.data2=data;
+					$('#wait2').hide();
+					}).
+			error(function(data, status, headers, config) {
+				   });
+			$http.get(endpoint+'?r=sab&n=d').
+			success(function(data, status, headers, config) {
+					$scope.data3=data;
+					$('#wait2').hide();
+					}).
 			error(function(data, status, headers, config) {
 				   });
 		ctrl.bOnClick=function(id,name){
 			$scope.data3=null;
 			$('#wait1').show();
 			$scope.title=name;
-			$http.get('http://ssupii.azurewebsites.net/z/ls?q=alumn&w='+id).
+			$http.get(endpoint+'?r=sas&n=a&bid='+id).
 				success(function(data, status, headers, config) {
-					if(data=="[]")
-						data="[{\"boleta\":\"\"}]";
-					data='{"a":"a","alumn":'+data+'}';
-					var a=JSON.parse(data);
-					$scope.data3=a;
+					$scope.data11=data;
 					$('#wait1').hide();
 					}).
 				error(function(data, status, headers, config) {
 				   });
 			 }
-		ctrl.semOnClick=function(y,s){
+		ctrl.ysOnClick=function(y,s){
+			$scope.data31=null;
+			$('#wait1').show();
 			$scope.currSem=' '+y+' - '+s;
-			$http.get('http://ssupii.azurewebsites.net/z/ls?q=alumn&sem='+y+'-'+s).
+			$http.get(endpoint+'?r=sas&n=a&s='+s+'&y='+y).
 				success(function(data, status, headers, config) {
-					 data='{"a":"a","sem":'+data+'}';
-					 var a=JSON.parse(data);
-					 $scope.data=a;
+					 $scope.data31=data;
 					 $('.wait-gif').hide();
 					 }).
 				error(function(data, status, headers, config) {

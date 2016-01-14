@@ -20,9 +20,13 @@
 				<div class="container">
 					<div class="row">
                         <div class="12u">
-                            
                             <header id="header">
-                                <h1><a href="#" id="logo">Upiita</a></h1>
+                                <div id="logo-array">
+									<ul>
+										<li><img id="upiitalogo" src="images/logo.png"/></li>
+										<li><h1><a href="#" id="logo"></a></h1></li>
+									</ul>
+								</div>
                                 <nav id="nav">
                                     <a href="index.html">Inicio</a>
                                     <a href="alumnos.html" class="current-page-item">Alumnos</a>
@@ -57,6 +61,12 @@
                                             <input type="submit" ng-click="update(a)" value="OK" />
                                         </form>
                                     </li>
+									<div class="wait-div"><img style="display:none" class="wait-gif" id="wait1" src="images/loading_spinner.gif"/></div>
+									<ul class="small-image-list">
+                                    <li ng-repeat="s in data31.data">
+                                        <h4 style="display:inline">{{'['+s.id+']'+' '+s.nombre+' '+s.ap_p+' ' +s.ap_m}}</h4>
+                                    </li>
+                                </ul>
                                 </ul>
 							</section>
 
@@ -66,8 +76,8 @@
 							<section>
 								<h2>Semestres</h2>
 								<ul class="small-image-list">
-									<li ng-repeat="s in data2.sem">
-                                        <a href=""><h3 style="display:inline" ng-click="ctrl.semOnClick(s.year,s.sem)">{{s.year}} - {{s.sem}} </h3></a><h5 style="display:inline">{{s.count}}</h5>
+									<li ng-repeat="s in data3.data">
+                                        <a href=""><h3 style="display:inline" ng-click="ctrl.ysOnClick(s.year,s.sem)">{{s.year}} - {{s.sem}} </h3></a><h5 style="display:inline">{{s.count}}</h5>
 									</li>
 								</ul>
 							</section>
