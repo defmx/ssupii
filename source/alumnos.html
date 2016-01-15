@@ -40,7 +40,7 @@
 					</div>
 				</div>
 			</div>
-			<div id="main" ng-controller="CTRL as ctrl">
+			<div id="main" ng-controller="ACTRL as ctrl">
 				<div class="container">
 					<div class="row main-row">
 						<div class="8u 12u(mobile)">
@@ -48,17 +48,28 @@
 							<section class="left-content">
                                 <ul class="small-image-list">
                                     <li>
-                                        <h2 ng-src="{{currSem}}">Alumnos de nuevo ingreso por semestre </h2> <h3 style="display:inline">( {{currSem}} )</h3>
+                                        <h2 ng-src="{{currSemYr}}">Alumnos de nuevo ingreso por semestre </h2> <h3 style="display:inline">( {{currSemYr}} )</h3>
                                     </li>
                                     <li>
-                                        <a href="" ng-click="showAddForm=!showAddForm"><h4 style="display:inline" ng-click="ctrl.newOnClick()">Agregar</h4></a>
-                                        <a href=""><h4 style="display:inline" ng-click="ctrl.newOnClick()">Buscar</h4></a>
+                                        <a href="" ng-click="showAddForm=!showAddForm" ng-show="canAdd"><h4 style="display:inline" ng-click="ctrl.newOnClick()">Agregar</h4></a>
+                                        <a href=""><h4 style="display:inline" ng-click="ctrl.newOnClick()" ng-show="canAdd">Buscar</h4></a>
                                     </li>
                                     <li ng-show="showAddForm">
                                         <form novalidate class="simple-form">
-                                            [ <input type="text" ng-model="a.id" required/> ]
-                                            <input type="text" ng-model="a.name" required/>
-                                            <input type="submit" ng-click="update(a)" value="OK" />
+                                            <input type="text" ng-model="a.id" required placeholder="Boleta"/> * <br/><br/>
+                                            <input type="text" ng-model="a.nombre" required placeholder="Nombre(s)"/> * <br/><br/>
+											<input type="text" ng-model="a.ap_p" required placeholder="Apellido Paterno"/> * <br/><br/>
+											<input type="text" ng-model="a.ap_m" required placeholder="Apellido Materno"/> * <br/><br/>
+											<select ng-options="option.name for option in formSemData.availableOptions track by option.id" ng-model="formSemData.selectedOption" convert-to-number>
+												<option value="1">1</option>
+												<option value="2">2</option>
+											</select> * <br/><br/>
+											<select ng-options="option.name for option in formYearData.availableOptions track by option.id" ng-model="formYearData.selectedOption" convert-to-number>
+												
+											</select> * <br/><br/>
+											<input type="text" ng-model="a.bid" required placeholder=""/> * <br/><br/>
+											<input type="text" ng-model="a.cid" required placeholder=""/> * <br/><br/>
+                                            <input type="submit" ng-click="updateA(a)" value="OK" />
                                         </form>
                                     </li>
 									<div class="wait-div"><img style="display:none" class="wait-gif" id="wait1" src="images/loading_spinner.gif"/></div>

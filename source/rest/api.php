@@ -23,6 +23,24 @@
 			$this->sQ[]="select calum.yr,calum.sem,count(1) FROM calum GROUP BY calum.yr,calum.sem";
 		}
 		
+		private function query($n){
+			if($n==="a"){
+				$q=$this->Q[0];
+				if(isset($_REQUEST['bid']) && $_REQUEST['bid']!=""){
+					$q=$q." WHERE calum.bid=".$_REQUEST['bid'];
+				}
+				elseif(isset($_REQUEST['s']) && $_REQUEST['s']!="" && isset($_REQUEST['y']) && $_REQUEST['y']!=""){
+					$q=$q." WHERE calum.sem=".$_REQUEST['s'];
+					$q=$q." AND calum.yr=".$_REQUEST['y'];
+				}
+				return $q;
+			}
+			if($n==="b")
+				return $this->Q[1];
+			if($n==="c")
+				return $this->Q[2];
+		}
+		
 		public function processApi(){
 			$func = strtolower(trim(str_replace("/","",$_REQUEST['r'])));
 			if((int)method_exists($this,$func) > 0)
@@ -47,7 +65,7 @@
 			$r=$this->mysqli->query($q);
 			if ($this->mysqli->error) {
 				$resp=array("q"=>$q,"err"=>$this->mysqli->error);
-				$this->response($this->json($resp),200);
+				$this->response(json_encode($resp),200);
 				return;
 			}
 			$result=array();
@@ -57,7 +75,7 @@
 			}
 			$resp=array("data"=>$result);
 			$this->mysqli->close();
-			$json_resp=$this->json($resp);
+			$json_resp=json_encode($resp);
 			if($json_resp){
 				$this->response($json_resp, 200);
 			}
@@ -76,7 +94,7 @@
 			$r=$this->mysqli->query($q);
 			if ($this->mysqli->error) {
 				$resp=array("q"=>$q,"err"=>$this->mysqli->error);
-				$this->response($this->json($resp),200);
+				$this->response(json_encode($resp),200);
 				return;
 			}
 			$result=array();
@@ -102,7 +120,7 @@
 			}
 			$resp=array("data"=>$result);
 			$this->mysqli->close();
-			$json_resp=$this->json($resp);
+			$json_resp=json_encode($resp);
 			if($json_resp){
 				$this->response($json_resp, 200);
 			}
@@ -112,22 +130,25 @@
 			}
 		}
 		
-		private function query($n){
-			if($n==="a"){
-				$q=$this->Q[0];
-				if(isset($_REQUEST['bid']) && $_REQUEST['bid']!=""){
-					$q=$q." WHERE calum.bid=".$_REQUEST['bid'];
-				}
-				elseif(isset($_REQUEST['s']) && $_REQUEST['s']!="" && isset($_REQUEST['y']) && $_REQUEST['y']!=""){
-					$q=$q." WHERE calum.sem=".$_REQUEST['s'];
-					$q=$q." AND calum.yr=".$_REQUEST['y'];
-				}
-				return $q;
+		private function waw(){
+			if($this->get_request_method() != "POST"){
+				$this->response('',406);
 			}
-			if($n==="b")
-				return $this->Q[1];
-			if($n==="c")
-				return $this->Q[2];
+			$data = json_decode(file_get_contents('php://input'), true);
+			$q="INSERT calum(_id,nom,app,apm,sem,yr,bid,cid) VALUES ("
+				.$data['id'].",'".$data['nombre']."','".$data['ap_p']."','".$data['ap_m']."',".$data['sem'].",".$data['yr'].",".$data['bid'].",".$data['cid']
+				.")";
+			$this->mysqli->query("SET NAMES 'utf8'");
+			$r=$this->mysqli->query($q);
+			if ($this->mysqli->error) {
+				$resp=array("q"=>$q,"err"=>$this->mysqli->error);
+				$this->response($this->json($resp),200);
+				return;
+			}
+			else{
+				$this->response('OK', 200);
+			}
+			$this->mysqli->close();
 		}
 		
 		private function json($data){
