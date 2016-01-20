@@ -17,8 +17,8 @@
 			parent::__construct();			
 			$this->mysqli = new mysqli("p:".self::DB_SERVER,self::DB_USER,self::DB_PASSWORD,self::DB_NAME);
 			$this->Q[]="SELECT calum._id as id,calum.nom as nombre,calum.app as ap_p, calum.apm as ap_m,cbeca._id as bid,cbeca.nom as bnom,ccarr._id as cid,ccarr.nom as cnom FROM calum join cbeca on calum.bid=cbeca._id join ccarr on calum.cid=ccarr._id";
-			$this->Q[]="SELECT cbeca._id,cbeca.nom,cbeca.amt,count(1)-isnull(calum.bid) as count FROM cbeca left join calum on cbeca._id=calum.bid group by cbeca._id";
-			$this->Q[]="SELECT _id as id,nom as nombre,tim as tiempo FROM ccarr1";
+			$this->Q[]="SELECT cbeca._id as bid,cbeca.nom,cbeca.amt,count(1)-isnull(calum.bid) as count FROM cbeca left join calum on cbeca._id=calum.bid group by cbeca._id";
+			$this->Q[]="SELECT _id as cid,nom,tim as tiempo FROM ccarr";
 			$this->Q[]="SELECT _key,val FROM cconf WHERE _key in ('MAX_YEAR','MIN_YEAR','SEM_PER_YEAR')";
 			$this->sQ[]="select calum.yr,calum.sem,count(1) FROM calum GROUP BY calum.yr,calum.sem";
 		}
@@ -28,10 +28,12 @@
 				$q=$this->Q[0];
 				if(isset($_REQUEST['bid']) && $_REQUEST['bid']!=""){
 					$q=$q." WHERE calum.bid=".$_REQUEST['bid'];
+					$q=$q."  ORDER BY calum.app,calum.apm";
 				}
 				elseif(isset($_REQUEST['s']) && $_REQUEST['s']!="" && isset($_REQUEST['y']) && $_REQUEST['y']!=""){
 					$q=$q." WHERE calum.sem=".$_REQUEST['s'];
 					$q=$q." AND calum.yr=".$_REQUEST['y'];
+					$q=$q."  ORDER BY calum.app,calum.apm";
 				}
 				return $q;
 			}
@@ -135,8 +137,14 @@
 				$this->response('',406);
 			}
 			$data = json_decode(file_get_contents('php://input'), true);
+			if(isset($data['id']) && $data['id']!=""){
+				$id="'".$data['id']."'";
+			}
+			else{
+				$id="uuid()";
+			}
 			$q="INSERT calum(_id,nom,app,apm,sem,yr,bid,cid) VALUES ("
-				.$data['id'].",'".$data['nombre']."','".$data['ap_p']."','".$data['ap_m']."',".$data['sem'].",".$data['yr'].",".$data['bid'].",".$data['cid']
+				.$id.",'".$data['nom']."','".$data['ap_p']."','".$data['ap_m']."',".$data['sem'].",".$data['yr'].",".$data['bid'].",".$data['cid']
 				.")";
 			$this->mysqli->query("SET NAMES 'utf8'");
 			$r=$this->mysqli->query($q);
@@ -146,7 +154,49 @@
 				return;
 			}
 			else{
-				$this->response('OK', 200);
+				$this->response('', 200);
+			}
+			$this->mysqli->close();
+		}
+		
+		private function del(){
+			if($this->get_request_method() != "DELETE"){
+				$this->response('',406);
+			}
+			if(isset($_REQUEST['n']) && $_REQUEST['n']!=""){
+				$n=$_REQUEST['n'];
+				if($n==="a"){
+					$table="calum";
+				}
+				elseif($n==="b"){
+					$table="cbeca";
+				}
+				elseif($n==="c"){
+					$table="ccarr";
+				}
+				else{
+					$this->response('UNDEF', 200);
+					return;
+				}
+			}
+			if(isset($_REQUEST['i']) && $_REQUEST['i']!=""){
+				$id=$_REQUEST['i'];
+			}
+			else{			
+				$this->response('UNDEF', 200);
+				return;
+			}
+			$data = json_decode(file_get_contents('php://input'), true);
+			$q="DELETE FROM $table WHERE _id='".$id."'";
+			$this->mysqli->query("SET NAMES 'utf8'");
+			$r=$this->mysqli->query($q);
+			if ($this->mysqli->error) {
+				$resp=array("q"=>$q,"err"=>$this->mysqli->error);
+				$this->response($this->json($resp),200);
+				return;
+			}
+			else{
+				$this->response('', 200);
 			}
 			$this->mysqli->close();
 		}

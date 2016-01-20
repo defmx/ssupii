@@ -1792,6 +1792,16 @@
 		height:35px;
 	}
 	
+	.ok-gif {
+		width:35px;
+		height:35px;
+	}
+	
+	.delete-gif {
+		width:5px;
+		height:5px;
+	}
+	
 	#logo-array {
 		list-style-type:none;
 	}
