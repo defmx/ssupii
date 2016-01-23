@@ -23,6 +23,7 @@
 		 require: 'ngModel',
 		 link: function(scope, element, attrs, modelCtrl) {
 			var capitalize = function(inputValue) {
+				if(!inputValue) return null;
 			   var capitalized = inputValue.charAt(0).toUpperCase() + inputValue.substring(1);
 			   if(inputValue.indexOf(' ')>0){
 				   capitalized=capitalized.replaceAt(inputValue.indexOf(' ')+1,inputValue.substring(inputValue.indexOf(' ')+1).charAt(0).toUpperCase());
@@ -105,6 +106,10 @@
 			$scope.currSem=s;
 			$scope.currYr=y;
 			$scope.currSemYr=' '+y+' - '+s;
+			$http.get(endpoint+'?r=sas&n=b')
+				.success(function(data, status, headers, config) {
+					$scope.data30=data;
+				});
 			$http.get(endpoint+'?r=sas&n=a&s='+s+'&y='+y)
 				.success(function(data, status, headers, config) {
 					 $scope.data31=data;

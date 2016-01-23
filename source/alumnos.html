@@ -85,11 +85,18 @@
                                     </li>
 									<div class="wait-div"><img style="display:none" class="wait-gif" id="wait1" src="images/loading_spinner.gif"/></div>
 									<ul class="small-image-list">
-                                    <li ng-repeat="s in data31.data">
-										<a href=""><img class="delete-gif" style="width:15px;height:15px;" confirmed-click="deleteA(s)" ng-confirm-click="Elminar a '{{s.nombre}}' ?" src="images/delete.png"/></a>
-                                        <h4 style="display:inline">{{'['+s.id+']'+' '+s.ap_p+' '+s.ap_m+' '+s.nombre}}</h4>
-                                    </li>
-                                </ul>
+										<li ng-repeat="b in data31.data">
+											<table class="small-image-list">
+												<tr>
+													<td><h4>{{b.b.nom}}</h4></td><td><h5>({{b.b.count}})</h5></td>
+												</tr>
+												<tr ng-repeat="s in b.b.data">
+													<td><a href=""><img class="delete-gif" style="width:15px;height:15px;" confirmed-click="deleteA(s)" ng-confirm-click="Elminar a '{{s.nombre}}' ?" src="images/delete.png"/></a></td>
+													<td style="display:inline;text-align:right;"><h5 style="margin-left:1em">{{'['+s.id+']'}}</h5></td><td><h4 style="margin-left:1em">{{'   ' + s.ap_p + ' ' + s.ap_m + ' ' + s.nombre}}</h4></td>
+												</tr>
+											</table>
+										</li>
+									</ul>
                                 </ul>
 							</section>
 
@@ -118,21 +125,6 @@
                                 <h2>Enlaces</h2>
                                 <div>
                                     <div class="row">
-                                        <div class="3u 12u(mobile)">
-                                            <ul class="link-list">
-                                                <li><a href="http://upiita.ipn.mx">upiita.ipn.mx</a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="3u 12u(mobile)">
-                                            <ul class="link-list">
-                                                <li><a href="http://upiita.ipn.mx">upiita.ipn.mx</a></li>
-                                            </ul>
-                                        </div>
-                                        <div class="3u 12u(mobile)">
-                                            <ul class="link-list">
-                                                <li><a href="http://upiita.ipn.mx">upiita.ipn.mx</a></li>
-                                            </ul>
-                                        </div>
                                         <div class="3u 12u(mobile)">
                                             <ul class="link-list">
                                                 <li><a href="http://upiita.ipn.mx">upiita.ipn.mx</a></li>

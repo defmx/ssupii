@@ -6,6 +6,7 @@
 		public $data="";
 		public $Q=array();
 		public $sQ=array();
+		public $staQ=array();
 		public $mysqli;
 		
 		const DB_SERVER="localhost";
@@ -21,20 +22,26 @@
 			$this->Q[]="SELECT _id as cid,nom,tim as tiempo FROM ccarr";
 			$this->Q[]="SELECT _key,val FROM cconf WHERE _key in ('MAX_YEAR','MIN_YEAR','SEM_PER_YEAR')";
 			$this->sQ[]="select calum.yr,calum.sem,count(1) FROM calum GROUP BY calum.yr,calum.sem";
+			//Sem-Carr
+			$this->staQ[]="select concat(convert(calum.yr,char),' - ',convert(calum.sem,char)) as k0 ,ccarr.nom as k1,count(1) as v0 from calum join ccarr on calum.cid=ccarr._id where calum.bid>0 group by calum.sem,calum.yr,ccarr.nom;";
+			//Sem
+			$this->staQ[]="select concat(convert(calum.yr,char),' - ',convert(calum.sem,char)) as k0 ,count(1) as v0 from calum join ccarr on calum.cid=ccarr._id where calum.bid>0 group by calum.sem,calum.yr";
+			//Sem-Carr-Beca
+			$hits->staQ[]="select concat(convert(calum.yr,char),' - ',convert(calum.sem,char)) as k0 ,ccarr.nom as k1, cbeca.nom as k2,count(1) as v0 from calum join ccarr on calum.cid=ccarr._id join cbeca on calum.bid=cbeca._id where calum.bid>0 group by calum.sem,calum.yr,ccarr.nom,cbeca.nom";
 		}
 		
 		private function query($n){
 			if($n==="a"){
 				$q=$this->Q[0];
+				$q.=" WHERE 1=1 ";
 				if(isset($_REQUEST['bid']) && $_REQUEST['bid']!=""){
-					$q=$q." WHERE calum.bid=".$_REQUEST['bid'];
-					$q=$q."  ORDER BY calum.app,calum.apm";
+					$q=$q." AND calum.bid=".$_REQUEST['bid'];
 				}
-				elseif(isset($_REQUEST['s']) && $_REQUEST['s']!="" && isset($_REQUEST['y']) && $_REQUEST['y']!=""){
-					$q=$q." WHERE calum.sem=".$_REQUEST['s'];
+				if(isset($_REQUEST['s']) && $_REQUEST['s']!="" && isset($_REQUEST['y']) && $_REQUEST['y']!=""){
+					$q=$q." AND calum.sem=".$_REQUEST['s'];
 					$q=$q." AND calum.yr=".$_REQUEST['y'];
-					$q=$q."  ORDER BY calum.app,calum.apm";
 				}
+				$q=$q."  ORDER BY cbeca._id,calum.app,calum.apm";
 				return $q;
 			}
 			if($n==="b")
@@ -56,7 +63,12 @@
 				$this->response('',406);
 			}
 			if(isset($_REQUEST['n']) && $_REQUEST['n']!=""){
-				$q=$this->query($_REQUEST['n']);
+				$n=$_REQUEST['n'];
+				if($n==="a"){
+					$this->sas_a($n);
+					return;
+				}
+				$q=$this->query($n);
 				if(!$q) return;
 			}
 			else{
@@ -73,7 +85,42 @@
 			$result=array();
 			while ($row=$r->fetch_assoc())
 			{
-				$result[]=$row;
+				$result[]=$row;	
+			}
+			$resp=array("data"=>$result);
+			$this->mysqli->close();
+			$json_resp=json_encode($resp);
+			if($json_resp){
+				$this->response($json_resp, 200);
+			}
+			else{
+				var_dump($resp);
+				$this->response(json_last_error_msg(), 200);
+			}
+		}
+		
+		private function sas_a($n){
+			$this->mysqli->query("SET NAMES 'utf8'");
+			$r=$this->mysqli->query($this->query("b"));
+			$b=array();
+			while ($row=$r->fetch_assoc())
+			{
+				$b[]=$row;	
+			}
+			$result=array();
+			foreach($b as $i){
+				$_REQUEST['bid']=$i['bid'];
+				$this->mysqli->query("SET NAMES 'utf8'");
+				$r=$this->mysqli->query($this->query("a"));
+				$h=array();
+				while($row=$r->fetch_assoc()){
+					$h[]=$row;
+				}
+				$data=array("nom"=>$i['nom'],"count"=>count($h),"data"=>$h);
+				$obj=new stdClass();
+				$obj->b=$data;
+				$result[]=$obj;
+				//$result[]=array($i['nom']=>$data);
 			}
 			$resp=array("data"=>$result);
 			$this->mysqli->close();
@@ -199,6 +246,41 @@
 				$this->response('', 200);
 			}
 			$this->mysqli->close();
+		}
+		
+		private function sta(){
+			if($this->get_request_method() != "GET"){
+				$this->response('',406);
+			}
+			if(isset($_REQUEST['n']) && $_REQUEST['n']!=""){
+				$n=$_REQUEST['n'];
+				if($n==="a"){
+					$i=0;
+				}
+				elseif($n==="b"){
+					$i=1;
+				}
+				elseif($n==="c"){
+					$i=2;
+				}
+				else{
+					$this->response('UNDEF', 200);
+					return;
+				}
+			}
+			$q=$this->staQ[$i];
+			$this->mysqli->query("SET NAMES 'utf8'");
+			$r=$this->mysqli->query($q);
+			if ($this->mysqli->error) {
+				$resp=array("q"=>$q,"err"=>$this->mysqli->error);
+				$this->response($this->json($resp),200);
+				return;
+			}
+			else{
+				$this->response('', 200);
+			}
+			
+			
 		}
 		
 		private function json($data){
