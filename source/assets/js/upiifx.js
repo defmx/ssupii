@@ -45,13 +45,8 @@
 			$scope.title="";
 			$scope.currSemYr="Seleccionar";
 			$scope.canAdd=false;
-			$http.get(endpoint+'?r=sas&n=a')
-				.success(function(data, status, headers, config) {
-					$scope.data1=data;
-					$('#wait2').hide();
-					})
-				.error(function(data, status, headers, config) {
-				   });
+			$('#formdata').hide();
+			$('#altnomdiv').hide();
 			$http.get(endpoint+'?r=sas&n=b')
 				.success(function(data, status, headers, config) {
 					$scope.data2=data;
@@ -59,19 +54,26 @@
 					}).
 			error(function(data, status, headers, config) {
 				   });
-		ctrl.bOnClick=function(id,name){
-			$scope.data3=null;
-			$('#wait1').show();
-			$scope.title=name;
-			$http.get(endpoint+'?r=sas&n=a&bid='+id)
-				.success(function(data, status, headers, config) {
-					$scope.data11=data;
-					$('#wait1').hide();
-					})
-				.error(function(data, status, headers, config) {
-				   });
-			 }
-			 }]);
+		ctrl.bOnClick=function(b){
+			$scope.data3=b;
+			$scope.bshowform=false;
+			$('#formdata').show();
+			$('#altnomdiv').hide();
+			$('#nomdiv').show();
+			$('#wait3').hide();
+			$('#submitok').hide();
+			if(b.bid<0){
+				$('#altnomdiv').show();
+				$('#nomdiv').hide();
+				$scope.visible=false;
+				b.altNom="Alumnos sin beca";
+			}
+			else{
+				$scope.visible=true;
+			}
+			$scope.title=b.nom;
+		}
+	}]);
 	dz.controller('ACTRL', ['$scope','$http', function($scope,$http){
 		var ctrl=this;
 		$scope.master = {};
