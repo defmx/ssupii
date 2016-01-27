@@ -1,9 +1,4 @@
 <!DOCTYPE HTML>
-<!--
-	Minimaxing by HTML5 UP
-	html5up.net | @n33co
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
 <html ng-app="upii">
 	<head>
 		<title>Becas</title>
@@ -62,9 +57,9 @@
 									<pre><hr/></pre>
 								</div>
 								<form>
-									<div id="nomdiv"><h4><pre>Nombre:</pre></h4><input type="text" ng-show="bshowform" ng-model="a.nom" placeholder="Nombre"/><h5 ng-show="!bshowform">{{data3.nom}}</h5><br/></div>
+									<div id="nomdiv"><h4><pre>Nombre:</pre></h4><input type="text" ng-show="bshowform" ng-model="a.nom" placeholder="{{data3.nom}}"/><h5 ng-show="!bshowform">{{data3.nom}}</h5><br/></div>
 									<div id="altnomdiv"><h5 ng-show="!bshowform">{{data3.altNom}}</h5><br/></div>
-									<h4 ng-show="visible"><pre>Monto:</pre></h4><input type="text" ng-show="bshowform" ng-model="a.amt" placeholder="Cantidad ($)"/><h5 ng-show="!bshowform && visible">{{data3.amt}}</h5><br/>
+									<h4 ng-show="visible"><pre>Monto:</pre></h4><input type="text" ng-show="bshowform" ng-model="a.amt" placeholder="{{data3.amt}}"/><h5 ng-show="!bshowform && visible">{{data3.amt}}</h5><br/>
 									<h4><pre>Total de alumnos:</pre></h4><h5>{{data3.count}}</h5><br/>
 									<pre>     </pre>
 									<input type="submit" ng-show="bshowform" ng-click="updateA(a)" value="OK" />

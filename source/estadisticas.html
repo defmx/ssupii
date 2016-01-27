@@ -1,12 +1,7 @@
 <!DOCTYPE HTML>
-<!--
-	Minimaxing by HTML5 UP
-	html5up.net | @n33co
-	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
--->
-<html>
+<html ng-app="upii">
 	<head>
-		<title>Becas</title>
+		<title>Estadísticas</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
@@ -23,6 +18,7 @@
 		<script src="assets/js/main.js"></script>
 		<script src="assets/js/angular.min.js"></script>
 		<script src="assets/js/upiifx.js"></script>
+		<script src="assets/js/canvasjs.min.js"></script>
 	</head>
 	<body>
 		<div id="page-wrapper">
@@ -32,7 +28,12 @@
                         <div class="12u">
                             
                             <header id="header">
-                                <h1><a href="#" id="logo">Upiita</a></h1>
+								<div id="logo-array">
+									<ul>
+										<li><img id="upiitalogo" src="images/logo.png"/></li>
+										<li><h1><a href="#" id="logo"></a></h1></li>
+									</ul>
+								</div>
                                 <nav id="nav">
                                     <a href="index.html">Inicio</a>
                                     <a href="alumnos.html">Alumnos</a>
@@ -46,7 +47,7 @@
 					</div>
 				</div>
 			</div>
-			<div id="main">
+			<div id="main" ng-controller="STACTRL as ctrl">
 				<div class="container">
 					<div class="row main-row">
 						<div class="4u 12u(mobile)">
@@ -55,7 +56,7 @@
 								<h2>Filtrar</h2>
 								<ul class="small-image-list">
 									<li>
-										<h4>Por año</h4>
+										<a href="" ng-click="xy('b')"><h4>Por año</h4></a>
 									</li>
                                     <li>
                                         <h4>Por beca</h4>
@@ -72,7 +73,7 @@
                             
                             <section class="right-content">
                                 <h2>Estadísticas</h2>
-                                <p></p>
+                                <div id="chartContainer" style="height: 300px; width: 100%;">
                             </section>
 
 						</div>
@@ -98,21 +99,6 @@
                             </section>
                             
                         </div>
-                        <!--
-                         <div class="4u 12u(mobile)">
-                         
-                         <section>
-                         <h2>Something of interest</h2>
-                         <p>Duis neque nisi, dapibus sed mattis quis, rutrum accumsan sed.
-                         Suspendisse eu varius nibh. Suspendisse vitae magna eget odio amet
-                         mollis justo facilisis quis. Sed sagittis mauris amet tellus gravida
-                         lorem ipsum dolor sit amet consequat blandit.</p>
-                         <footer class="controls">
-                         <a href="#" class="button">Oh, please continue ....</a>
-                         </footer>
-                         </section>
-                         
-                         </div>-->
                     </div>
                     <div class="row">
                         <div class="12u">

@@ -149,4 +149,19 @@
 				});
 		}
 			 }]);
+	dz.controller('STACTRL', ['$scope','$http', function($scope,$http){
+		$scope.title="";
+		
+		$scope.xy=function(a){
+			$http.get(endpoint+'?r=sta&n='+a)
+				.success(function(data, status, headers, config) {
+					if(status===200){
+						//var chart = new CanvasJS.Chart("chartContainer", {"title":"","data":[{"dataPoints":[{"label":"(Sin beca)","y":54},{"label":"Institucional A","y":0},{"label":"Institucional B","y":0},{"label":"Institucional C","y":0},{"label":"Pronabes","y":12},{"label":"B\u00e9calos","y":1},{"label":"h-h","y":0},{"label":"Telmex","y":0},{"label":"Alto Rendimiento","y":0},{"label":"Probeup","y":2}],"type":"spline"}]});
+						var chart = new CanvasJS.Chart("chartContainer", data);
+						chart.render();
+					}
+			});
+			
+		}
+	}]);
   })();

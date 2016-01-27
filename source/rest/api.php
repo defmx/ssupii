@@ -24,8 +24,9 @@
 			$this->sQ[]="select calum.yr,calum.sem,count(1) FROM calum GROUP BY calum.yr,calum.sem";
 			//Sem-Carr
 			$this->staQ[]="select concat(convert(calum.yr,char),' - ',convert(calum.sem,char)) as k0 ,ccarr.nom as k1,count(1) as v0 from calum join ccarr on calum.cid=ccarr._id where calum.bid>0 group by calum.sem,calum.yr,ccarr.nom;";
-			//Sem
-			$this->staQ[]="select concat(convert(calum.yr,char),' - ',convert(calum.sem,char)) as k0 ,count(1) as v0 from calum join ccarr on calum.cid=ccarr._id where calum.bid>0 group by calum.sem,calum.yr";
+			//Sem-Beca
+			$this->staQ[]="SELECT distinct yr,sem FROM calum";
+			$this->staQ[]="SELECT count(1) as c FROM calum WHERE yr={y} and sem={s} and bid={b} GROUP BY yr,sem,bid";
 			//Sem-Carr-Beca
 			$hits->staQ[]="select concat(convert(calum.yr,char),' - ',convert(calum.sem,char)) as k0 ,ccarr.nom as k1, cbeca.nom as k2,count(1) as v0 from calum join ccarr on calum.cid=ccarr._id join cbeca on calum.bid=cbeca._id where calum.bid>0 group by calum.sem,calum.yr,ccarr.nom,cbeca.nom";
 		}
@@ -261,26 +262,52 @@
 					$i=1;
 				}
 				elseif($n==="c"){
-					$i=2;
+					$i=3;
 				}
 				else{
 					$this->response('UNDEF', 200);
 					return;
 				}
 			}
-			$q=$this->staQ[$i];
+			$this->mysqli->query("SET NAMES 'utf8'");
+			$r=$this->mysqli->query($this->query("b"));
+			$h=array();
+			while($row=$r->fetch_assoc()){
+				$h[]=$row;
+			}
+			$result=array();			
+			$q=$this->staQ[1];
 			$this->mysqli->query("SET NAMES 'utf8'");
 			$r=$this->mysqli->query($q);
-			if ($this->mysqli->error) {
-				$resp=array("q"=>$q,"err"=>$this->mysqli->error);
-				$this->response($this->json($resp),200);
-				return;
-			}
-			else{
-				$this->response('', 200);
-			}
-			
-			
+			while($row=$r->fetch_assoc()){
+				$obj=new stdClass();
+				$obj->dataPoints=array();
+				$obj->type="spline";
+				$obj->showInLegend=true;
+				$obj->name=$row['yr']."-".$row['sem'];
+				$obj->legendText=$row['yr']."-".$row['sem'];
+				foreach($h as $g){
+					$obj1=new stdClass();
+					$obj1->label=$g['nom'];
+					$q_=$this->staQ[2];
+					$this->mysqli->query("SET NAMES 'utf8'");
+					$q_=str_replace("{y}",$row['yr'],$q_);
+					$q_=str_replace("{s}",$row['sem'],$q_);
+					$q_=str_replace("{b}",$g['bid'],$q_);
+					$r_=$this->mysqli->query($q_);
+					$row_=$r_->fetch_assoc();
+					if($row_['c']){
+						$obj1->y=intval($row_['c']);
+					}
+					else{
+						$obj1->y=0;
+					}					
+					$obj->dataPoints[]=$obj1;
+				}
+				$result[]=$obj;
+			}			
+			$resp=array("title"=>"","data"=>$result);
+			$this->response($this->json($resp),200);
 		}
 		
 		private function json($data){
