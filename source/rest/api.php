@@ -310,6 +310,44 @@
 			$this->response($this->json($resp),200);
 		}
 		
+		private function fcsv(){
+			if($this->get_request_method() != "GET"){
+				$this->response('',406);
+			}
+			if(isset($_REQUEST['f']) && $_REQUEST['f']!=""){
+				$f=$_REQUEST['f'];
+			}
+			else{
+				$this->response('',404);
+				return;
+			}
+			if(($g=fopen($f,"r"))!==false){
+				while(($l=fgetcsv($g,100,","))!==false){
+					$jcount=count($l);
+					$q="INSERT calum(_id,nom,app,apm,cid,bid,sem,yr) SELECT {id},'{nom}','{app}','{apm}',{cid},{bid},2,2014";
+					$id="substring(uuid(),1,20)";
+					$nparts=explode(" ",$l[0]);
+					$app=$nparts[0];
+					$apm=$nparts[1];
+					$nom=$nparts[2];
+					if(count($nparts)>3){
+						$nom.=" ".$nparts[3];
+					}
+					$cid=$l[1];
+					$bid=$l[11];
+					$q=str_replace("{id}",$id,$q);
+					$q=str_replace("{nom}",$nom,$q);
+					$q=str_replace("{app}",$app,$q);
+					$q=str_replace("{apm}",$apm,$q);
+					$q=str_replace("{cid}",$cid,$q);
+					$q=str_replace("{bid}",$bid,$q);
+					$this->mysqli->query("SET NAMES 'utf8'");
+					$this->mysqli->query($q);
+				}
+			}
+			fclose($g);
+		}
+		
 		private function json($data){
 			return json_encode($data);
 		}

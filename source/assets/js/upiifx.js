@@ -24,13 +24,10 @@
 		 link: function(scope, element, attrs, modelCtrl) {
 			var capitalize = function(inputValue) {
 				if(!inputValue) return null;
-			   var capitalized = inputValue.charAt(0).toUpperCase() + inputValue.substring(1);
-			   if(inputValue.indexOf(' ')>0){
-				   capitalized=capitalized.replaceAt(inputValue.indexOf(' ')+1,inputValue.substring(inputValue.indexOf(' ')+1).charAt(0).toUpperCase());
-			   }
-			   if(capitalized !== inputValue) {
-				  modelCtrl.$setViewValue(capitalized);
-				  modelCtrl.$render();
+				var capitalized = inputValue.toUpperCase();
+				if(capitalized !== inputValue) {
+					modelCtrl.$setViewValue(capitalized);
+					modelCtrl.$render();
 				}
 				return capitalized;
 			 }
@@ -77,8 +74,8 @@
 	dz.controller('ACTRL', ['$scope','$http', function($scope,$http){
 		var ctrl=this;
 		$scope.master = {};
-		$('#wait3').hide();
-		$('#submitok').hide();
+		$('.wait3').hide();
+		$('.ok-gif').hide();
 		$scope.currSemYr="Seleccionar";
 		$scope.canAdd=false;
 		$scope.reset = function() {
@@ -126,12 +123,12 @@
 			data.cid=$scope.mnuCarr.cid;
 			data.sem=$scope.currSem;
 			data.yr=$scope.currYr;
-			$('#wait3').show();
+			$('.wait3').show();
 			$http.post(endpoint+'?r=waw&n=a',data)
 				.success(function(data, status, headers, config) {
 					if(status===200){
-						$('#wait3').hide();
-						$('#submitok').show();
+						$('.wait3').hide();
+						$('.ok-gif').show();
 						$scope.reset();
 						ctrl.ysOnClick($scope.currYr,$scope.currSem);
 						setTimeout(function() {

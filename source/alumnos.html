@@ -51,16 +51,18 @@
 						<div class="8u 12u(mobile)">
 
 							<section class="left-content">
+								<h2>Alumnos de nuevo ingreso por semestre</h2><h3 style="display:inline">( {{currSemYr}} )</h3>
+								
+								<div class="actionBar" ng-show="canAdd">
+									<hr/>
+									<a href="" ng-click="showAddForm=!showAddForm"><img style="width:25px;height:25px;margin:5px;" src="images/add_user.png"/></a>
+                                    <a href="" ng-click="showSearchForm=!showSearchForm"><img style="width:25px;height:25px;margin:5px;" src="images/search.png"/></a>
+									<a href="" ng-click="ctrl.csvLoad()"><img style="width:25px;height:25px;margin:5px;" src="images/csv.png"/></a>
+									<pre><hr/></pre>
+								</div>
                                 <ul class="small-image-list">
-                                    <li>
-                                        <h2 ng-src="{{currSemYr}}">Alumnos de nuevo ingreso por semestre </h2> <h3 style="display:inline">( {{currSemYr}} )</h3>
-                                    </li>
-                                    <li>
-                                        <a href="" ng-click="showAddForm=!showAddForm" ng-show="canAdd"><h4 style="display:inline" ng-click="ctrl.newOnClick()">Agregar</h4></a>
-                                        <a href=""><h4 style="display:inline" ng-click="ctrl.newOnClick()" ng-show="canAdd">Buscar</h4></a>
-                                    </li>
                                     <li ng-show="showAddForm">
-                                        <form >
+                                        <form class="animate-show">
 											<pre>Alumno: </pre>
                                             <input type="text" ng-model="a.id" placeholder="Boleta"/> <br/><br/>
                                             <input type="text" ng-model="a.nom" required placeholder="Nombre(s)" capitalize-first/> * <br/><br/>
@@ -74,8 +76,17 @@
 											<input type="hidden"/>
 											<pre>     </pre>
                                             <input type="submit" ng-click="updateA(a)" value="OK" />
-											<div class="wait-div"><img class="wait-gif" id="wait3" src="images/loading_spinner.gif"/></div>
-											<div class="ok-div"><img style="width:30px;height:30px;" class="ok-gif" id="submitok" src="images/check.gif"/></div>
+											<div class="wait-div"><img class="wait3" src="images/loading_spinner.gif"/></div>
+											<div class="ok-div"><img style="width:30px;height:30px;" class="ok-gif" src="images/check.gif"/></div>
+                                        </form>
+                                    </li>
+									<li ng-show="showSearchForm">
+                                        <form class="animate-show">
+											<pre>Buscar: </pre>
+                                            <input type="text" ng-model="a.id" placeholder="Término de búsqueda (boleta, nombre o carrera)" size="50"/> <br/><br/>
+                                            <input type="submit" ng-click="searchA(a)" value="OK" />
+											<div class="wait-div"><img class="wait3" src="images/loading_spinner.gif"/></div>
+											<div class="ok-div"><img style="width:20px;height:20px;" class="ok-gif" id="submitok" src="images/check.gif"/></div>
                                         </form>
                                     </li>
 									<div class="wait-div"><img style="display:none" class="wait-gif" id="wait1" src="images/loading_spinner.gif"/></div>
@@ -149,6 +160,7 @@
                         <div class="12u">
                             
                             <div id="copyright">
+								<p> Avenida Instituto Politécnico Nacional No. 2580, Col Barrio la Laguna Ticomán, Gustavo A. Madero, México D.F., C.P. 07340.Tels.: 57296000, ext. 56806</p>
                                 &copy; Upiita IPN. México.
                             </div>
                             
