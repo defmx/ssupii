@@ -321,20 +321,51 @@
 				$this->response('',404);
 				return;
 			}
+			if(!(isset($_REQUEST['ts']) && $_REQUEST['ts']!=""){
+				$this->response('',404);
+				return;
+			}
+			$ts=$_REQUEST['ts'];
 			if(($g=fopen($f,"r"))!==false){
 				while(($l=fgetcsv($g,100,","))!==false){
 					$jcount=count($l);
-					$q="INSERT calum(_id,nom,app,apm,cid,bid,sem,yr) SELECT {id},'{nom}','{app}','{apm}',{cid},{bid},2,2014";
-					$id="substring(uuid(),1,20)";
-					$nparts=explode(" ",$l[0]);
+					$q="set @id={id};call sp_insAlum(@id,'{nom}','{app}','{apm}',{cid},{bid},2,2014);select @id as id";
+					$qr=array();
+					$q__="INSERT rz00(aid,bid,sem,yr) SELECT '{aid}',{bid},{sem},{yr}";
+					$id=$l[0];
+					if(!$id){
+						$id="null";
+					}
+					$nparts=explode(" ",$l[1]);
 					$app=$nparts[0];
 					$apm=$nparts[1];
 					$nom=$nparts[2];
 					if(count($nparts)>3){
 						$nom.=" ".$nparts[3];
 					}
-					$cid=$l[1];
-					$bid=$l[11];
+					$cid=$l[2];
+					$s=1;
+					$y=2010;
+					for($j=3;$j<=count($l)-1;$j++){
+						$bid=$l[$j];
+						if($bid==0)
+							$bid=-1;			
+						$q_=$q__;
+						if($id!=="null"){
+							$q_=str_replace("{aid}",$id,$q_);
+						}
+						$q_=str_replace("{bid}",$bid,$q_);
+						$q_=str_replace("{sem}",$s,$q_);
+						$q_=str_replace("{yr}",$y,$q_);
+						$qr[]=$q_;
+						if($s==2){
+							$y++;
+							$s=1;
+						}
+						else{
+							$s++;
+						}
+					}
 					$q=str_replace("{id}",$id,$q);
 					$q=str_replace("{nom}",$nom,$q);
 					$q=str_replace("{app}",$app,$q);
@@ -342,7 +373,25 @@
 					$q=str_replace("{cid}",$cid,$q);
 					$q=str_replace("{bid}",$bid,$q);
 					$this->mysqli->query("SET NAMES 'utf8'");
-					$this->mysqli->query($q);
+					foreach(explode(";",$q) as $qp){
+						var_dump($qp);
+						$r=$this->mysqli->query($qp);
+					}
+					if($this->mysqli->error){
+						//var_dump($q);
+						var_dump($this->mysqli->error);
+						return;
+					}
+					else{
+						$res=$r->fetch_assoc();
+						$id=$res['id'];
+						foreach($qr as $r){
+							$q_=str_replace("{aid}",$id,$r);
+							//var_dump($q_);
+							$this->mysqli->query("SET NAMES 'utf8'");
+							$this->mysqli->query($q_);
+						}
+					}
 				}
 			}
 			fclose($g);
@@ -354,5 +403,6 @@
 	}
 		
 	$api = new API;
+	ini_set('max_execution_time', 500);
 	$api->processApi();
 ?>
