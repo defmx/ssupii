@@ -7,6 +7,7 @@
 		public $Q=array();
 		public $sQ=array();
 		public $staQ=array();
+		public $stQ=array();
 		public $mysqli;
 		
 		const DB_SERVER="localhost";
@@ -28,7 +29,11 @@
 			$this->staQ[]="SELECT distinct yr,sem FROM calum";
 			$this->staQ[]="SELECT count(1) as c FROM calum WHERE yr={y} and sem={s} and bid={b} GROUP BY yr,sem,bid";
 			//Sem-Carr-Beca
-			$hits->staQ[]="select concat(convert(calum.yr,char),' - ',convert(calum.sem,char)) as k0 ,ccarr.nom as k1, cbeca.nom as k2,count(1) as v0 from calum join ccarr on calum.cid=ccarr._id join cbeca on calum.bid=cbeca._id where calum.bid>0 group by calum.sem,calum.yr,ccarr.nom,cbeca.nom";
+			$this->staQ[]="select concat(convert(calum.yr,char),' - ',convert(calum.sem,char)) as k0 ,ccarr.nom as k1, cbeca.nom as k2,count(1) as v0 from calum join ccarr on calum.cid=ccarr._id join cbeca on calum.bid=cbeca._id where calum.bid>0 group by calum.sem,calum.yr,ccarr.nom,cbeca.nom";
+			//Alumno-Beca
+			$this->stQ[]="SELECT bid,sem,yr FROM rz00 WHERE aid='{aid}' ORDER BY yr,sem";
+			//Alumno-Beca2
+			$this->stQ[]="SELECT rz00.aid,calum.nom,calum.app,calum.apm,count(1) FROM rz00 join calum on rz00.aid=calum._id group by rz00.aid,rz00.bid having rz00.bid>0";
 		}
 		
 		private function query($n){
@@ -161,7 +166,7 @@
 				}
 			}
 			for($i=$MAX_YEAR;$i>=$MIN_YEAR;$i--){
-				for($j=1;$j<=$SEM_PER_YEAR;$j++){
+				for($j=$SEM_PER_YEAR;$j>0;$j--){
 					$obj=new stdClass();
 					$obj->year=$i;
 					$obj->sem=$j;
@@ -310,31 +315,43 @@
 			$this->response($this->json($resp),200);
 		}
 		
-		private function fcsv(){
+		private function stq(){
 			if($this->get_request_method() != "GET"){
 				$this->response('',406);
 			}
-			if(isset($_REQUEST['f']) && $_REQUEST['f']!=""){
-				$f=$_REQUEST['f'];
+			if(isset($_REQUEST['n']) && $_REQUEST['n']!=""){
+				$n=$_REQUEST['n'];
+				if($n==="a"){
+					$i=0;
+				}
+				else{
+					$this->response('UNDEF', 200);
+					return;
+				}
 			}
-			else{
-				$this->response('',404);
-				return;
+		}
+		
+		private function fcsv(){
+			if($this->get_request_method() != "POST"){
+				$this->response('',406);
 			}
-			if(!(isset($_REQUEST['ts']) && $_REQUEST['ts']!=""){
-				$this->response('',404);
-				return;
+			if(!(isset($_REQUEST['s']) && $_REQUEST['s']!="" && isset($_REQUEST['y']) && $_REQUEST['y']!="")){
+				$this->response('',400);
 			}
-			$ts=$_REQUEST['ts'];
+			$f=$_FILES["fileUpload"]["tmp_name"];
+			$lines_processed=0;
 			if(($g=fopen($f,"r"))!==false){
 				while(($l=fgetcsv($g,100,","))!==false){
 					$jcount=count($l);
-					$q="set @id={id};call sp_insAlum(@id,'{nom}','{app}','{apm}',{cid},{bid},2,2014);select @id as id";
+					$q="set @id={id};call sp_insAlum(@id,'{nom}','{app}','{apm}',{cid},{bid},2,2014,{si},{yri});select @id as id";
 					$qr=array();
-					$q__="INSERT rz00(aid,bid,sem,yr) SELECT '{aid}',{bid},{sem},{yr}";
+					$q__="INSERT rz00(aid,bid,sem,yr) SELECT {aid},{bid},{sem},{yr}";
 					$id=$l[0];
 					if(!$id){
 						$id="null";
+					}
+					else{
+						$id="'".$id."'";
 					}
 					$nparts=explode(" ",$l[1]);
 					$app=$nparts[0];
@@ -344,8 +361,10 @@
 						$nom.=" ".$nparts[3];
 					}
 					$cid=$l[2];
-					$s=1;
-					$y=2010;
+					$s=$_REQUEST['s'];
+					$y=$_REQUEST['y'];
+					$si=$_REQUEST['s'];
+					$yi=$_REQUEST['y'];
 					for($j=3;$j<=count($l)-1;$j++){
 						$bid=$l[$j];
 						if($bid==0)
@@ -372,9 +391,11 @@
 					$q=str_replace("{apm}",$apm,$q);
 					$q=str_replace("{cid}",$cid,$q);
 					$q=str_replace("{bid}",$bid,$q);
+					$q=str_replace("{si}",$si,$q);
+					$q=str_replace("{yri}",$yi,$q);
 					$this->mysqli->query("SET NAMES 'utf8'");
 					foreach(explode(";",$q) as $qp){
-						var_dump($qp);
+						//var_dump($qp);
 						$r=$this->mysqli->query($qp);
 					}
 					if($this->mysqli->error){
@@ -383,10 +404,11 @@
 						return;
 					}
 					else{
+						$lines_processed++;
 						$res=$r->fetch_assoc();
 						$id=$res['id'];
 						foreach($qr as $r){
-							$q_=str_replace("{aid}",$id,$r);
+							$q_=str_replace("{aid}","'".$id."'",$r);
 							//var_dump($q_);
 							$this->mysqli->query("SET NAMES 'utf8'");
 							$this->mysqli->query($q_);
@@ -395,6 +417,10 @@
 				}
 			}
 			fclose($g);
+			$response=new stdClass();
+			$response->message="OK: $lines_processed rows";
+			$response->input=$_FILES["fileUpload"]["name"];
+			$this->response($this->json($response),200);
 		}
 		
 		private function json($data){

@@ -1,0 +1,116 @@
+<!DOCTYPE HTML>
+<html ng-app="upii">
+	<head>
+		<title>Estadísticas</title>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+		<link rel="stylesheet" href="assets/css/main.css" />
+		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
+        <link href="images/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon">
+
+		<!-- Scripts -->
+		<script src="assets/js/jquery.min.js"></script>
+		<script src="assets/js/skel.min.js"></script>
+		<script src="assets/js/skel-viewport.min.js"></script>
+		<script src="assets/js/util.js"></script>
+		<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
+		<script src="assets/js/main.js"></script>
+		<script src="assets/js/angular.min.js"></script>
+		<script src="assets/js/upiifx.js"></script>
+		<script src="assets/js/canvasjs.min.js"></script>
+	</head>
+	<body>
+		<div id="page-wrapper">
+			<div id="header-wrapper">
+				<div class="container">
+					<div class="row">
+                        <div class="12u">
+                            
+                            <header id="header">
+								<div id="logo-array">
+									<ul>
+										<li><img id="upiitalogo" src="images/logo.png"/></li>
+										<li><h1><a href="#" id="logo"></a></h1></li>
+									</ul>
+								</div>
+                                <nav id="nav">
+                                    <a href="index.html">Inicio</a>
+                                    <a href="alumnos.html">Alumnos</a>
+                                    <a href="estadisticas.html">Estadísticas</a>
+                                    <a href="becas.html">Becas</a>
+									<a href="lineatiempo.html" class="current-page-item">Línea del tiempo</a>
+                                </nav>
+                            </header>
+
+						</div>
+					</div>
+				</div>
+			</div>
+			<div id="main" ng-controller="STACTRL as ctrl">
+				<div class="container">
+					<div class="row main-row">
+						<div class="4u 12u(mobile)">
+
+							<section>
+								<h2>Filtrar</h2>
+								<ul class="small-image-list">
+									<li>
+										<a href="" ng-click="alum_rand()"><h4>Por alumno</h4></a>
+										<ul>
+											<li ng-repeat="s in data1.data"><h5>{{s.id}}</h5><h6>{{s.app}} {{s.apm}} {{s.nom}}</h6><h5>{{s.score}}</h5></li>
+										</ul>
+									</li>
+								</ul>
+							</section>
+
+
+						</div>
+                        <div class="8u 12u(mobile) important(mobile)"> 
+                            
+                            <section class="right-content">
+                                <h2>Línea del tiempo</h2>
+                                <div id="chartContainer" style="height: 300px; width: 100%;">
+                            </section>
+
+						</div>
+					</div>
+				</div>
+			</div>
+            <div id="footer-wrapper">
+                <div class="container">
+                    <div class="row">
+                        <div class="8u 12u(mobile)">
+                            
+                            <section>
+                                <h2>Enlaces</h2>
+                                <div>
+                                    <div class="row">
+                                        <div class="3u 12u(mobile)">
+                                            <ul class="link-list">
+                                                <li><a href="http://upiita.ipn.mx">upiita.ipn.mx</a></li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </section>
+                            
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="12u">
+                            
+                            <div id="copyright">
+								<p> Avenida Instituto Politécnico Nacional No. 2580, Col Barrio la Laguna Ticomán, Gustavo A. Madero, México D.F., C.P. 07340.Tels.: 57296000, ext. 56806</p>
+                                &copy; Upiita IPN. México.
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+
+	</body>
+</html>

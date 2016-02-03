@@ -161,4 +161,27 @@
 			
 		}
 	}]);
+	dz.controller('LINTMPCTRL', ['$scope','$http', function($scope,$http){
+		$scope.title="";
+		
+		$scope.xy=function(a){
+			$http.get(endpoint+'?r=sta&n='+a)
+				.success(function(data, status, headers, config) {
+					if(status===200){
+						var chart = new CanvasJS.Chart("chartContainer", data);
+						chart.render();
+					}
+			});
+		}
+		
+		$scope.alum_rand=function(){
+			$http.get(endpoint+'?r=stq&n=a')
+				.success(function(data, status, headers, config) {
+					if(status===200){
+						$scope.data1=data;
+					}
+			});
+		}
+	}]);
+
   })();
