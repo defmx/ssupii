@@ -18,10 +18,11 @@
 		public function __construct(){
 			parent::__construct();			
 			$this->mysqli = new mysqli("p:".self::DB_SERVER,self::DB_USER,self::DB_PASSWORD,self::DB_NAME);
-			$this->Q[]="SELECT calum._id as id,calum.nom as nombre,calum.app as ap_p, calum.apm as ap_m,cbeca._id as bid,cbeca.nom as bnom,ccarr._id as cid,ccarr.nom as cnom FROM calum join cbeca on calum.bid=cbeca._id join ccarr on calum.cid=ccarr._id";
+			$this->Q[]="SELECT calum._id as id,calum.nom as nombre,calum.app as ap_p, calum.apm as ap_m,cbeca._id as bid,cbeca.nom as bnom,ccarr._id as cid,ccarr.nom as cnom,0 as showEdit FROM calum join cbeca on calum.bid=cbeca._id join ccarr on calum.cid=ccarr._id";
 			$this->Q[]="SELECT cbeca._id as bid,cbeca.nom,cbeca.amt,count(1)-isnull(calum.bid) as count FROM cbeca left join calum on cbeca._id=calum.bid group by cbeca._id";
 			$this->Q[]="SELECT _id as cid,nom,tim as tiempo FROM ccarr";
 			$this->Q[]="SELECT _key,val FROM cconf WHERE _key in ('MAX_YEAR','MIN_YEAR','SEM_PER_YEAR')";
+			$this->Q[]="SELECT calum.* FROM calum WHERE _id LIKE '%{q}%' OR nom LIKE '%{q}%' OR app LIKE '%{q}%' OR apm LIKE '%{q}%' ORDER BY calum.app,calum.apm,calum.nom";
 			$this->sQ[]="select calum.yr,calum.sem,count(1) FROM calum GROUP BY calum.yr,calum.sem";
 			//Sem-Carr
 			$this->staQ[]="select concat(convert(calum.yr,char),' - ',convert(calum.sem,char)) as k0 ,ccarr.nom as k1,count(1) as v0 from calum join ccarr on calum.cid=ccarr._id where calum.bid>0 group by calum.sem,calum.yr,ccarr.nom;";
@@ -31,7 +32,7 @@
 			//Sem-Carr-Beca
 			$this->staQ[]="select concat(convert(calum.yr,char),' - ',convert(calum.sem,char)) as k0 ,ccarr.nom as k1, cbeca.nom as k2,count(1) as v0 from calum join ccarr on calum.cid=ccarr._id join cbeca on calum.bid=cbeca._id where calum.bid>0 group by calum.sem,calum.yr,ccarr.nom,cbeca.nom";
 			//Alumno-Beca
-			$this->stQ[]="SELECT bid,sem,yr FROM rz00 WHERE aid='{aid}' ORDER BY yr,sem";
+			$this->stQ[]="SELECT concat(convert(rz00.yr,char),' - ',convert(rz00.sem,char)) as ys,bid FROM rz00 WHERE aid='{aid}' ORDER BY yr,sem";
 			//Alumno-Beca2
 			$this->stQ[]="SELECT rz00.aid,calum.nom,calum.app,calum.apm,count(1) FROM rz00 join calum on rz00.aid=calum._id group by rz00.aid,rz00.bid having rz00.bid>0";
 		}
@@ -58,8 +59,28 @@
 		
 		public function processApi(){
 			$func = strtolower(trim(str_replace("/","",$_REQUEST['r'])));
-			if((int)method_exists($this,$func) > 0)
-				$this->$func();
+			if((int)method_exists($this,$func) > 0){
+				if($func=="seek"){
+					if($this->get_request_method() != "GET"){
+						$this->response('',406);
+					}
+					if(isset($_REQUEST['q']) && $_REQUEST['q']!=""){
+						$w=$_REQUEST['q'];
+						$this->$func($w);
+					}
+				}
+				elseif($func=="stq"){
+					if($this->get_request_method() != "GET"){
+						$this->response('',406);
+					}
+					if(isset($_REQUEST['n']) && $_REQUEST['n']!=""){
+						$w=$_REQUEST['n'];
+						$this->$func($w);
+					}
+				}
+				else
+					$this->$func();
+			}
 			else
 				$this->response('',404);
 		}
@@ -315,22 +336,6 @@
 			$this->response($this->json($resp),200);
 		}
 		
-		private function stq(){
-			if($this->get_request_method() != "GET"){
-				$this->response('',406);
-			}
-			if(isset($_REQUEST['n']) && $_REQUEST['n']!=""){
-				$n=$_REQUEST['n'];
-				if($n==="a"){
-					$i=0;
-				}
-				else{
-					$this->response('UNDEF', 200);
-					return;
-				}
-			}
-		}
-		
 		private function fcsv(){
 			if($this->get_request_method() != "POST"){
 				$this->response('',406);
@@ -421,6 +426,57 @@
 			$response->message="OK: $lines_processed rows";
 			$response->input=$_FILES["fileUpload"]["name"];
 			$this->response($this->json($response),200);
+		}
+		
+		private function seek($s){
+			$q=$this->Q[4];
+			$s=str_replace("'",null,$s);
+			$q=str_replace("{q}",$s,$q);
+			$r=$this->mysqli->query("SET NAMES 'utf8'");
+			$r=$this->mysqli->query($q);
+			if($this->mysqli->error){
+				var_dump($q);
+				var_dump($this->mysqli->error);
+				return;
+			}
+			else{
+				$res=array();
+				while($row=$r->fetch_assoc()){
+					$res[]=$row;
+				}
+				$resp=array("data"=>$res);
+				$this->response($this->json($resp),200);
+			}
+		}
+		
+		private function stq($s){
+			$q=str_replace("{aid}",$s,$this->stQ[0]);
+			$this->mysqli->query("SET NAMES 'utf8'");
+			$r=$this->mysqli->query($q);
+			$dataPoints=array();
+			while($row=$r->fetch_assoc()){
+				$sub=new stdClass();
+				$sub->label=$row['ys'];
+				$sub->y=intval($row['bid']);
+				$dataPoints[]=$sub;
+			}
+			$resp=new stdClass();
+			$resp->title="";
+			$resp->animationEnabled=true;
+			$axisy=new stdClass();
+			$axisy->interval=1;
+			$axisy->minimum=-1;
+			$axisy->thickness=1;
+			$axisy->gridThickness=1;
+			$resp->axisY=$axisy;
+			$data=array();
+			$datasub=new stdClass();
+			$datasub->dataPoints=$dataPoints;
+			$datasub->type="scatter";
+			$data[]=$datasub;
+			$resp->data=$data;
+			$resp->data=$data;
+			$this->response($this->json($resp),200);
 		}
 		
 		private function json($data){

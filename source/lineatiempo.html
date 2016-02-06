@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html ng-app="upii">
 	<head>
-		<title>Estadísticas</title>
+		<title>Línea del tiempo por alumno</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
@@ -47,19 +47,28 @@
 					</div>
 				</div>
 			</div>
-			<div id="main" ng-controller="STACTRL as ctrl">
+			<div id="main" ng-controller="LINTMPCTRL as ctrl">
 				<div class="container">
 					<div class="row main-row">
 						<div class="4u 12u(mobile)">
-
+							<h2>Alumnos</h2>
 							<section>
-								<h2>Filtrar</h2>
 								<ul class="small-image-list">
 									<li>
-										<a href="" ng-click="alum_rand()"><h4>Por alumno</h4></a>
-										<ul>
-											<li ng-repeat="s in data1.data"><h5>{{s.id}}</h5><h6>{{s.app}} {{s.apm}} {{s.nom}}</h6><h5>{{s.score}}</h5></li>
-										</ul>
+                                        <form>
+											<pre>Buscar: </pre>
+                                            <input type="text" ng-model="q" placeholder="(Boleta, nombre o apellidos)" size="30"/>
+                                            <input type="submit" ng-click="search(q)" value="OK" />
+											<div class="wait-div"><img id="wait1" style="width:35px;height:35px;" src="images/loading_spinner.gif"/></div>
+                                        </form>
+                                    </li>
+									<li><pre>{{data1.data.length}} Resultados</pre></li>
+									<li>
+										<table class="small-image-list">
+											<tr ng-repeat="s in data1.data">
+												<td style="display:inline;text-align:right;"><a href="" ng-click="xy(s)"><h5 class="subh5" style="margin-left:1em">{{'['+s._id+']'}}</h5></a></td><td><h4 class="subh4" style="margin-left:1em">{{'   ' + s.app + ' ' + s.apm + ' ' + s.nom}}</h4></td>
+											</tr>
+										</table>
 									</li>
 								</ul>
 							</section>
@@ -70,6 +79,7 @@
                             
                             <section class="right-content">
                                 <h2>Línea del tiempo</h2>
+								<h5>{{a._id}}</h5><h4>{{a.nom + ' ' + a.app + ' ' + a.apm}}</h4>
                                 <div id="chartContainer" style="height: 300px; width: 100%;">
                             </section>
 

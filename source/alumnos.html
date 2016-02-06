@@ -17,7 +17,19 @@
 		<!--[if lte IE 8]><script src="assets/js/ie/respond.min.js"></script><![endif]-->
 		<script src="assets/js/main.js"></script>
 		<script src="assets/js/angular.min.js"></script>
+		<script src="assets/js/ngDialog.min.js"></script>
 		<script src="assets/js/upiifx.js"></script>
+		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-animate.js"></script>
+		<script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-1.1.2.js"></script>
+		<script src="example.js"></script>
+		<link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
+		<script type="text/ng-template" id="myPopoverTemplate.html">
+			<div>{{dynamicPopover.content}}</div>
+			<div class="form-group">
+			  <label>Popup Title:</label>
+			  <input type="text" ng-model="dynamicPopover.title" class="form-control">
+			</div>
+		</script>
 	</head>
 	<body>
 		<div id="page-wrapper">
@@ -97,7 +109,10 @@
 													<td><h4>{{b.b.nom}}</h4></td><td><h5>({{b.b.count}})</h5></td>
 												</tr>
 												<tr ng-repeat="s in b.b.data">
-													<td><a href=""><img class="delete-gif" style="width:15px;height:15px;" confirmed-click="deleteA(s)" ng-confirm-click="Elminar a '{{s.nombre}}' ?" src="images/delete.png"/></a></td>
+													<td>
+														<a href=""><img class="delete-gif" style="width:15px;height:15px;" confirmed-click="deleteA(s)" ng-confirm-click="Elminar a '{{s.nombre}}' ?" src="images/delete.png"/></a>
+														<a href="" uib-popover-template="dynamicPopover.templateUrl" popover-title="Editar" type="button" class="btn btn-default"><img class="edit-gif" style="margin-left:5px;width:15px;height:15px;" ng-click="editDialog(s)" src="images/edit.png"/></a>
+													</td>
 													<td style="display:inline;text-align:right;"><h5 style="margin-left:1em">{{'['+s.id+']'}}</h5></td><td><h4 style="margin-left:1em">{{'   ' + s.ap_p + ' ' + s.ap_m + ' ' + s.nombre}}</h4></td>
 												</tr>
 											</table>
