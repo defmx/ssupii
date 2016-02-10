@@ -2,21 +2,8 @@
 	String.prototype.replaceAt=function(index, _char) {
 		return this.substr(0, index) + _char + this.substr(index+_char.length);
 	}
-  var dz=angular.module('upii', ['ngDialog']);
+  var dz=angular.module('upii', ['ngAnimate', 'ui.bootstrap']);
   var endpoint="http://localhost:82/rest/api.php";
-  dz.config(['ngDialogProvider', function (ngDialogProvider) {
-            ngDialogProvider.setDefaults({
-                className: 'ngdialog-theme-default',
-                plain: false,
-                showClose: true,
-                closeByDocument: true,
-                closeByEscape: true,
-                appendTo: false,
-                preCloseCallback: function () {
-                    console.log('default pre-close callback');
-                }
-            });
-        }]);
   dz.directive('ngConfirmClick', [
         function(){
             return {
@@ -94,6 +81,32 @@
 		$scope.reset = function() {
 			$scope.a = angular.copy($scope.master);
 		};
+		$scope.dynamicPopover = {
+			content: 'Hello, World!',
+			templateUrl: 'myPopoverTemplate.html',
+			title: 'Title'
+		};
+		$scope.placement = {
+			options: [
+			  'top',
+			  'top-left',
+			  'top-right',
+			  'bottom',
+			  'bottom-left',
+			  'bottom-right',
+			  'left',
+			  'left-top',
+			  'left-bottom',
+			  'right',
+			  'right-top',
+			  'right-bottom'
+			],
+			selected: 'left'
+		};
+		$scope.newA = function() {
+			$scope.reset();
+			$scope.showAddForm=!$scope.showAddForm;
+		};
 		$http.get(endpoint+'?r=sas&n=c')
 				.success(function(data, status, headers, config) {
 					$scope.data1=data;
@@ -111,7 +124,7 @@
 				};
 				$('#wait2').hide();
 			});
-		ctrl.ysOnClick=function(y,s){
+		$scope.ysOnClick=function(y,s){
 			$scope.data31=null;
 			$('#wait1').show();
 			$scope.canAdd=true;
@@ -158,10 +171,10 @@
 					}
 				});
 		}
-		$scope.editDialog=function(s){
-			ngDialog.open({ template: 'popupTmpl.html' });
+		$scope.scope=function(a){
+			$scope.a=a;
 		}
-			 }]);
+		}]);
 			 
 	dz.controller('STACTRL', ['$scope','$http', function($scope,$http){
 		$scope.title="";
