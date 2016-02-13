@@ -2,9 +2,9 @@
 	String.prototype.replaceAt=function(index, _char) {
 		return this.substr(0, index) + _char + this.substr(index+_char.length);
 	}
-  var dz=angular.module('upii', ['ngAnimate', 'ui.bootstrap']);
-  var endpoint="http://localhost:82/rest/api.php";
-  dz.directive('ngConfirmClick', [
+	var dz=angular.module('upii', ['ngAnimate', 'ui.bootstrap', 'ngCookies']);
+	var endpoint="http://ss.localhost:82/rest/api.php";
+	dz.directive('ngConfirmClick', [
         function(){
             return {
                 link: function (scope, element, attr) {
@@ -18,7 +18,7 @@
                 }
             };
     }]);
-  dz.directive('capitalizeFirst', function(uppercaseFilter, $parse) {
+	dz.directive('capitalizeFirst', function(uppercaseFilter, $parse) {
 	   return {
 		 require: 'ngModel',
 		 link: function(scope, element, attrs, modelCtrl) {
@@ -37,7 +37,7 @@
 		 }
 	   };
 	});
-  dz.controller('BCTRL', ['$scope','$http', function($scope,$http){
+	dz.controller('BCTRL', ['$scope','$http','$cookies', function($scope,$http){
 			var ctrl=this;
 			$scope.title="";
 			$scope.currSemYr="Seleccionar";
@@ -71,7 +71,7 @@
 			$scope.title=b.nom;
 		}
 	}]);
-	dz.controller('ACTRL', ['$scope','$http', function($scope,$http,ngDialog){
+	dz.controller('ACTRL', ['$scope','$http','$cookies', function($scope,$http,ngDialog){
 		var ctrl=this;
 		$scope.master = {};
 		$('.wait3').hide();
@@ -152,7 +152,7 @@
 			$('.wait3').show();
 			$http.post(endpoint+'?r=waw&n=a',data)
 				.success(function(data, status, headers, config) {
-					if(status===200){
+					if(status==200){
 						$('.wait3').hide();
 						$('.ok-gif').show();
 						$scope.reset();
@@ -166,7 +166,7 @@
 		$scope.deleteA=function(a){
 			$http.delete(endpoint+'?r=del&n=a&i='+a.id)
 				.success(function(data, status, headers, config) {
-					if(status===200){
+					if(status==200){
 						ctrl.ysOnClick($scope.currYr,$scope.currSem);
 					}
 				});
@@ -176,13 +176,13 @@
 		}
 		}]);
 			 
-	dz.controller('STACTRL', ['$scope','$http', function($scope,$http){
+	dz.controller('STACTRL', ['$scope','$http','$cookies', function($scope,$http){
 		$scope.title="";
 		
 		$scope.xy=function(a){
 			$http.get(endpoint+'?r=sta&n='+a)
 				.success(function(data, status, headers, config) {
-					if(status===200){
+					if(status==200){
 						//var chart = new CanvasJS.Chart("chartContainer", {"title":"","data":[{"dataPoints":[{"label":"(Sin beca)","y":54},{"label":"Institucional A","y":0},{"label":"Institucional B","y":0},{"label":"Institucional C","y":0},{"label":"Pronabes","y":12},{"label":"B\u00e9calos","y":1},{"label":"h-h","y":0},{"label":"Telmex","y":0},{"label":"Alto Rendimiento","y":0},{"label":"Probeup","y":2}],"type":"spline"}]});
 						var chart = new CanvasJS.Chart("chartContainer", data);
 						chart.render();
@@ -191,14 +191,14 @@
 			
 		}
 	}]);
-	dz.controller('LINTMPCTRL', ['$scope','$http', function($scope,$http){
+	dz.controller('LINTMPCTRL', ['$scope','$http','$cookies', function($scope,$http){
 		$scope.title="";
 		$('#wait1').hide();
 		$scope.xy=function(a){
 			$scope.a=a;
 			$http.get(endpoint+'?r=stq&n='+a._id)
 				.success(function(data, status, headers, config) {
-					if(status===200){
+					if(status==200){
 						/*var chart = new CanvasJS.Chart("chartContainer"
 							, {"title":""
 							,animationEnabled: true
@@ -271,12 +271,63 @@
 			if(!q)q='%';
 			$http.get(endpoint+'?r=seek&q='+q)
 				.success(function(data, status, headers, config) {
-					if(status===200){
+					if(status==200){
 						$scope.data1=data;
 						$('#wait1').hide();
 					}
 			});
 		}
 	}]);
-
+	dz.controller('LCTRL', ['$scope','$http','$cookies', function($scope,$http,$cookies){
+		$scope.showLoginErrMsg=false;
+		$scope.mnu=new Object();
+		if($cookies.get("sssnid")){
+			$scope.sssn=new Object();
+			$scope.sssn.id=$cookies.get("sssnid");
+			$scope.sssn.usr=$cookies.get("sssnusr");
+			$scope.sssn.flgs=$cookies.get("sssnflgs");
+			$scope.showSessionInfo=true;
+			$scope.mnu.a="alumnos.html";
+			$scope.mnu.e="estadisticas.html";
+			$scope.mnu.b="becas.html";
+			$scope.mnu.l="lineatiempo.html";
+		}
+		else{
+			$scope.showSessionInfo=false;	
+			$scope.mnu.a=null;
+			$scope.mnu.e=null;
+			$scope.mnu.b=null;
+			$scope.mnu.l=null;
+		}
+		$scope.login=function(u){
+			$scope.showLoginErrMsg=false;
+			var v=new Object();	
+			v.id=u.id;
+			v.z=btoa(u.z);
+			$http.post(endpoint+'?r=zzz',v)
+				.success(function(data, status, headers, config) {
+					if(status==200){
+						$scope.mnu.a="alumnos.html";
+						$scope.mnu.e="estadisticas.html";
+						$scope.mnu.b="becas.html";
+						$scope.mnu.l="lineatiempo.html";
+						var expd=new Date(data.created);
+						expd.setSeconds(expd.getSeconds()+parseInt(data.duration));
+						$cookies.put("sssnid",data.sssnid,{expires:expd});
+						$cookies.put("sssnusr",data.user,{expires:expd});
+						$cookies.put("sssnflgs",data.flags,{expires:expd});
+						$scope.sssn=new Object();
+						$scope.sssn.id=$cookies.get("sssnid");
+						$scope.sssn.usr=$cookies.get("sssnusr");
+						$scope.sssn.flgs=$cookies.get("sssnflgs");
+						$scope.showSessionInfo=true;
+					}
+				})
+				.error(function(data, status, headers, config) {
+					if(status==404){
+						$scope.showLoginErrMsg=true;
+					}
+				});;
+		}
+	}]);
   })();

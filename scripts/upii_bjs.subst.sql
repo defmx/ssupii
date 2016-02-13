@@ -122,6 +122,93 @@ INSERT INTO `cconf` VALUES ('MAX_YEAR','2014'),('MIN_YEAR','2010'),('SEM_PER_YEA
 UNLOCK TABLES;
 
 --
+-- Table structure for table `krole`
+--
+
+DROP TABLE IF EXISTS `krole`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `krole` (
+  `_id` int(11) NOT NULL AUTO_INCREMENT,
+  `nom` varchar(45) DEFAULT NULL,
+  `flags` int(11) DEFAULT NULL,
+  PRIMARY KEY (`_id`)
+) ENGINE=InnoDB AUTO_INCREMENT=1000 DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `krole`
+--
+
+LOCK TABLES `krole` WRITE;
+/*!40000 ALTER TABLE `krole` DISABLE KEYS */;
+INSERT INTO `krole` VALUES (1,'ADM',0),(2,'SUBADM',1),(999,'MASTER',0);
+/*!40000 ALTER TABLE `krole` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `ksess`
+--
+
+DROP TABLE IF EXISTS `ksess`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `ksess` (
+  `_id` varchar(36) NOT NULL,
+  `uid` varchar(4) DEFAULT NULL,
+  `duration` int(11) DEFAULT NULL,
+  `persist` bit(1) DEFAULT NULL,
+  `created` datetime DEFAULT NULL,
+  `guest_name` varchar(100) DEFAULT NULL,
+  `guest_ip` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`_id`),
+  KEY `FK_KUSERS_ID_idx` (`uid`),
+  CONSTRAINT `FK_KUSERS_ID` FOREIGN KEY (`uid`) REFERENCES `kusrs` (`_id`) ON DELETE NO ACTION ON UPDATE NO ACTION
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `ksess`
+--
+
+LOCK TABLES `ksess` WRITE;
+/*!40000 ALTER TABLE `ksess` DISABLE KEYS */;
+INSERT INTO `ksess` VALUES ('02db2e20-d1df-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:19:06','HOLA','127.0.0.1'),('1191a7cc-d1e0-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:26:40','HOLA','127.0.0.1'),('12206b58-d1d9-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 16:36:34','HOLA','127.0.0.1'),('162098c2-d1d8-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 16:29:32','HOLA','127.0.0.1'),('204c525a-d1da-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 16:44:08','HOLA','127.0.0.1'),('217b5449-d1db-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 16:51:19','HOLA','127.0.0.1'),('2b153e93-d1df-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:20:13','HOLA','127.0.0.1'),('2c3e4727-d1d8-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 16:30:09','HOLA','127.0.0.1'),('38b76501-d1de-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:13:27','HOLA','127.0.0.1'),('4685bd1a-d1dd-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:06:40','HOLA','127.0.0.1'),('501a7d84-d1dd-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:06:56','HOLA','127.0.0.1'),('582f1b1f-d1d6-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 16:17:03','HOLA','127.0.0.1'),('5f1baeb9-d1da-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 16:45:53','HOLA','127.0.0.1'),('6061c10e-d1d6-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 16:17:17','HOLA','127.0.0.1'),('7a63af0a-d1dc-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:00:58','HOLA','127.0.0.1'),('7a841547-d1d6-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 16:18:01','HOLA','127.0.0.1'),('7d885417-d1de-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:15:22','HOLA','127.0.0.1'),('81482c07-d1de-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:15:28','HOLA','127.0.0.1'),('815f848a-d1e2-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:44:06','HOLA','127.0.0.1'),('834f2242-d1dc-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:01:13','HOLA','127.0.0.1'),('956992b4-d1de-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:16:02','HOLA','127.0.0.1'),('96fdc0b1-d1dd-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:08:55','HOLA','127.0.0.1'),('a0defc6a-d1de-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:16:21','HOLA','127.0.0.1'),('be3733a6-d1dc-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:02:52','HOLA','127.0.0.1'),('c825f47d-d1de-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:17:27','HOLA','127.0.0.1'),('cf522663-d1dc-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:03:20','HOLA','127.0.0.1'),('d34b9f38-d1d7-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 16:27:39','HOLA','127.0.0.1'),('da243911-d1d5-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 16:13:32','HOLA','127.0.0.1'),('e47171b5-d1d7-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 16:28:08','HOLA','127.0.0.1'),('e9bd143f-d1e5-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 18:08:30','HOLA','127.0.0.1'),('f1f72c58-d1dd-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:11:28','HOLA','127.0.0.1'),('f2076e14-d1de-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:18:37','HOLA','127.0.0.1'),('f27c18e9-d1dd-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:11:29','HOLA','127.0.0.1'),('f2ccf0b8-d1dd-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:11:29','HOLA','127.0.0.1'),('f2e8afb1-d1dd-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:11:29','HOLA','127.0.0.1'),('f302bd43-d1dd-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:11:30','HOLA','127.0.0.1'),('f31f5d18-d1dd-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:11:30','HOLA','127.0.0.1'),('f33b950a-d1dd-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:11:30','HOLA','127.0.0.1'),('f359854e-d1dd-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:11:30','HOLA','127.0.0.1'),('f37d231e-d1dd-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:11:30','HOLA','127.0.0.1'),('f3a35b44-d1dd-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:11:31','HOLA','127.0.0.1'),('f3c9c73a-d1dd-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:11:31','HOLA','127.0.0.1'),('fafb4b75-d1dd-11e5-9e2f-0205857feb80','admc',1000,'\0','2016-02-12 17:11:43','HOLA','127.0.0.1');
+/*!40000 ALTER TABLE `ksess` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `kusrs`
+--
+
+DROP TABLE IF EXISTS `kusrs`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `kusrs` (
+  `_id` varchar(4) NOT NULL,
+  `email` varchar(100) DEFAULT NULL,
+  `nom` varchar(45) DEFAULT NULL,
+  `app` varchar(45) DEFAULT NULL,
+  `apm` varchar(45) DEFAULT NULL,
+  `rid` int(11) DEFAULT NULL,
+  `gzzms` varchar(45) DEFAULT NULL,
+  PRIMARY KEY (`_id`),
+  KEY `FK_ROLEID_idx` (`rid`),
+  CONSTRAINT `FK_ROLEID` FOREIGN KEY (`rid`) REFERENCES `krole` (`_id`) ON DELETE SET NULL ON UPDATE SET NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `kusrs`
+--
+
+LOCK TABLES `kusrs` WRITE;
+/*!40000 ALTER TABLE `kusrs` DISABLE KEYS */;
+INSERT INTO `kusrs` VALUES ('admc','dxmessage@gmail.com','Mauro','Arredondo','Ramírez',1,'cGFzc3dvcmQ='),('usr1','m@ipn.mx','Parko',NULL,NULL,2,'cGFzc3dvcmQ='),('usr2','z@ipn.mx','Parjo',NULL,NULL,2,'cGFzc3dvcmQ='),('zzzz','dxmessage@gmail.com','Mauro','Arredondo','Ramírez',999,'cGFzc3dvcmQ=');
+/*!40000 ALTER TABLE `kusrs` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
 -- Table structure for table `rz00`
 --
 
@@ -157,4 +244,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2016-02-02 22:34:59
+-- Dump completed on 2016-02-12 23:50:34

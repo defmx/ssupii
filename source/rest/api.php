@@ -78,6 +78,13 @@
 						$this->$func($w);
 					}
 				}
+				elseif($func=="zzz"){
+					if($this->get_request_method() != "POST"){
+						$this->response('',406);
+					}
+					$data = json_decode(file_get_contents('php://input'), true);
+					$this->$func($data);
+				}
 				else
 					$this->$func();
 			}
@@ -472,11 +479,42 @@
 			$data=array();
 			$datasub=new stdClass();
 			$datasub->dataPoints=$dataPoints;
-			$datasub->type="scatter";
+			$datasub->type="spline";
 			$data[]=$datasub;
 			$resp->data=$data;
 			$resp->data=$data;
 			$this->response($this->json($resp),200);
+		}
+		
+		private function zzz($u){
+			$q="SELECT krole._id as role,krole.flags FROM kusrs JOIN krole ON kusrs.rid=krole._id WHERE kusrs._id='{id}' AND kusrs.gzzms='{z}'";
+			$id=str_replace("'",null,$u['id']);
+			$z=str_replace("'",null,$u['z']);
+			$q=str_replace("{id}",$id,$q);
+			$q=str_replace("{z}",$z,$q);
+			$r=$this->mysqli->query($q);
+			if(!$this->mysqli->error){
+				$row=$r->fetch_assoc();
+				if($row){
+					$q="set @id='';call sp_crSession(@id,'admc','HOLA','127.0.0.1');select @id";
+					foreach(explode(";",$q) as $q_){
+						$r=$this->mysqli->query($q_);
+					}
+					$row=$r->fetch_assoc();
+					if(!$row){
+						$this->response("",404);
+					}
+					$sessid=$row['@id'];
+					$q="select ksess._id as sssnid,kusrs._id as user,ksess.duration,ksess.persist,ksess.created,krole.flags FROM ksess JOIN kusrs ON ksess.uid=kusrs._id JOIN krole ON krole._id=kusrs.rid WHERE ksess._id='{sessid}'";
+					$q=str_replace("{sessid}",$sessid,$q);
+					$r=$this->mysqli->query($q);
+					$row=$r->fetch_assoc();
+					$this->response($this->json($row),200);
+				}
+				else{
+					$this->response("",404);
+				}
+			}
 		}
 		
 		private function json($data){
