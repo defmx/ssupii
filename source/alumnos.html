@@ -20,10 +20,11 @@
 		<script src="assets/js/angular.min.js"></script>
 		<script src="assets/js/angular-cookies.min.js"></script>
 		<script src="assets/js/upiifx.js"></script>
-		<script src="//ajax.googleapis.com/ajax/libs/angularjs/1.4.9/angular-animate.js"></script>
-		<script src="//angular-ui.github.io/bootstrap/ui-bootstrap-tpls-1.1.2.js"></script>
+		<script src="assets/js/angular-animate.js"></script>
+		<script src="assets/js/ui-bootstrap-tpls-1.1.2.js"></script>
 		<script type="text/ng-template" id="myPopoverTemplate.html">
 			<div class="form-group">
+				<input type="hidden" ng-model="a.id0" class="form-control">
 				<pre>Boleta:<input type="text" ng-model="a.id" class="form-control"></pre>
 				<pre>Nombre:<input type="text" ng-model="a.nombre" class="form-control"></pre>
 				<pre>Apellido Paterno:<input type="text" ng-model="a.ap_p" class="form-control"></pre>
@@ -33,7 +34,7 @@
 		</script>
 	</head>
 	<body>
-		<div id="page-wrapper">
+		<div id="page-wrapper" ng-controller="ACTRL as ctrl">
 			<div id="header-wrapper">
 				<div class="container">
 					<div class="row">
@@ -59,33 +60,32 @@
 					</div>
 				</div>
 			</div>
-			<div id="main" ng-controller="ACTRL as ctrl">
+			<div id="main">
 				<div class="container">
 					<div class="row main-row">
 						<div class="8u 12u(mobile)">
 
 							<section class="left-content">
 								<h2>Alumnos de nuevo ingreso por semestre</h2><h3 style="display:inline">( {{currSemYr}} )</h3>
-								<hr/>
+								
 								<div class="actionBar" ng-show="canAdd">
-									<a href="" ng-click="newA()"><img style="width:25px;height:25px;margin:5px;" src="images/add_user.png"/></a>
-                                    <a href="" ng-click="showSearchForm=!showSearchForm"><img style="width:25px;height:25px;margin:5px;" src="images/search.png"/></a>
-									<a href="" ng-click="ctrl.csvLoad()"><img style="width:25px;height:25px;margin:5px;" src="images/csv.png"/></a>
+									<a href="" ng-click="newA()"><img style="width:25px;height:25px;margin-right:5px;" src="images/add_user.png"/></a>
+                                    <a href="" ng-click="showSearchForm=!showSearchForm"><img style="width:25px;height:25px;margin-right:5px;" src="images/search.png"/></a>
+									<a href="" ng-click="showCsvForm=!showCsvForm"><img style="width:25px;height:25px;margin-right:5px;" src="images/csv.png"/></a>
 								</div>
-								<hr/>
                                 <ul class="small-image-list">
                                     <li ng-show="showAddForm">
                                         <form class="animate-show">
 											<pre>Alumno: </pre>
-                                            <input type="text" ng-model="a.id" placeholder="Boleta"/> <br/><br/>
-                                            <input type="text" ng-model="a.nom" required placeholder="Nombre(s)" capitalize-first/> * <br/><br/>
-											<input type="text" ng-model="a.ap_p" required placeholder="Apellido Paterno" capitalize-first/> * <br/><br/>
-											<input type="text" ng-model="a.ap_m" required placeholder="Apellido Materno" capitalize-first/> * <br/><br/>
+                                            <input type="text" ng-model="a.id" placeholder="Boleta"/> <br/>
+                                            <input type="text" ng-model="a.nom" required placeholder="Nombre(s)" capitalize-first/> * <br/>
+											<input type="text" ng-model="a.ap_p" required placeholder="Apellido Paterno" capitalize-first/> * <br/>
+											<input type="text" ng-model="a.ap_m" required placeholder="Apellido Materno" capitalize-first/> * <br/>
 											<pre>Carrera: </pre>
-											<select ng-model="mnuCarr" ng-options="a.nom for a in data1.data" /> * <br/><br/>
+											<select ng-model="mnuCarr" ng-options="a.nom for a in data1.data" /> * <br/>
 											<input type="hidden"/>
 											<pre>Beca: </pre>
-											<select ng-model="mnuBecas" ng-options="a.nom for a in data2.data" /> * <br/><br/>
+											<select ng-model="mnuBecas" ng-options="a.nom for a in data2.data" /> * <br/>
 											<input type="hidden"/>
 											<pre>     </pre>
                                             <input type="submit" ng-click="updateA(a)" value="OK" />
@@ -96,10 +96,23 @@
 									<li ng-show="showSearchForm">
                                         <form class="animate-show">
 											<pre>Buscar: </pre>
-                                            <input type="text" ng-model="a.id" placeholder="Término de búsqueda (boleta, nombre o carrera)" size="50"/> <br/><br/>
-                                            <input type="submit" ng-click="searchA(a)" value="OK" />
+                                            <input type="text" ng-model="f" placeholder="Término de búsqueda (boleta, nombre o carrera)" size="50"/>
+                                            <input type="submit" ng-click="seek(currYr,currSem,f)" value="OK" />
 											<div class="wait-div"><img class="wait3" src="images/loading_spinner.gif"/></div>
 											<div class="ok-div"><img style="width:20px;height:20px;" class="ok-gif" id="submitok" src="images/check.gif"/></div>
+                                        </form>
+                                    </li>
+									<li ng-show="showCsvForm">
+                                        <form class="animate-show">
+											<pre>Cargar información (csv): </pre>
+											<label for="fileUpload" class="custom-file-upload">
+												Seleccionar archivo ({{f.name}})
+											</label>
+                                            <input id="fileUpload" type="file" name="fileUpload" />
+                                            <input type="submit" ng-click="submitCsv()" value="OK" />
+											<div class="wait-div"><img class="wait3" src="images/loading_spinner.gif"/></div>
+											<div class="ok-div"><img style="width:30px;height:30px;" class="ok-gif" id="submitok" src="images/check.gif"/></div>
+											<pre class="srvrMsg">{{srvrMsg}}</pre>
                                         </form>
                                     </li>
 									<div class="wait-div"><img style="display:none;width:30px;height:30px;" class="wait-gif" id="wait1" src="images/loading_spinner.gif"/></div>
@@ -129,7 +142,7 @@
 								<h2>Semestres</h2>
 								<ul class="small-image-list">
 									<li ng-repeat="s in data3.data">
-                                        <a href=""><h3 style="display:inline" ng-click="ysOnClick(s.year,s.sem)">{{s.year}} - {{s.sem}} </h3></a><h5 style="display:inline">{{s.count}}</h5>
+                                        <a href=""><h3 style="display:inline" ng-click="seek(s.year,s.sem)">{{s.year}} - {{s.sem}} </h3></a><h5 style="display:inline">{{s.count}}</h5>
 									</li>
 								</ul>
 							</section>

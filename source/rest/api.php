@@ -22,7 +22,6 @@
 			$this->Q[]="SELECT cbeca._id as bid,cbeca.nom,cbeca.amt,count(1)-isnull(calum.bid) as count FROM cbeca left join calum on cbeca._id=calum.bid group by cbeca._id";
 			$this->Q[]="SELECT _id as cid,nom,tim as tiempo FROM ccarr";
 			$this->Q[]="SELECT _key,val FROM cconf WHERE _key in ('MAX_YEAR','MIN_YEAR','SEM_PER_YEAR')";
-			$this->Q[]="SELECT calum.* FROM calum WHERE _id LIKE '%{q}%' OR nom LIKE '%{q}%' OR app LIKE '%{q}%' OR apm LIKE '%{q}%' ORDER BY calum.app,calum.apm,calum.nom";
 			$this->sQ[]="select calum.yr,calum.sem,count(1) FROM calum GROUP BY calum.yr,calum.sem";
 			//Sem-Carr
 			$this->staQ[]="select concat(convert(calum.yr,char),' - ',convert(calum.sem,char)) as k0 ,ccarr.nom as k1,count(1) as v0 from calum join ccarr on calum.cid=ccarr._id where calum.bid>0 group by calum.sem,calum.yr,ccarr.nom;";
@@ -59,6 +58,29 @@
 		
 		public function processApi(){
 			$func = strtolower(trim(str_replace("/","",$_REQUEST['r'])));
+			$sssn=null;
+			if(isset($_REQUEST['sssn']) && $_REQUEST['sssn']!=""){
+				$sssn=$_REQUEST['sssn'];
+				$q="SELECT duration,created FROM ksess WHERE _id='$sssn'";
+				$r=$this->mysqli->query($q);
+				$row=$r->fetch_assoc();
+				if($row){
+					$interval=new DateInterval('PT'.$row['duration'].'S');
+					$created=strtotime($row['created']);
+					$expires=strtotime(date("Y-m-d h:i:s",$created)." +1000 seconds");
+					$now=strtotime(date("Y-m-d h:i:s"));
+					if($now>$expires){
+						$sssn=null;
+					}
+				}
+				elseif($func!=="zzz"){
+					$sssn=null;
+				}
+			}
+			if(!$sssn && $func!=="zzz"){
+				$this->response(json_encode("Session expired"),401);
+				return;
+			}
 			if((int)method_exists($this,$func) > 0){
 				if($func=="seek"){
 					if($this->get_request_method() != "GET"){
@@ -85,6 +107,13 @@
 					$data = json_decode(file_get_contents('php://input'), true);
 					$this->$func($data);
 				}
+				elseif($func=="waw"){					
+					if($this->get_request_method() != "POST"){
+						$this->response('',406);
+					}
+					$data = json_decode(file_get_contents('php://input'), true);
+					$this->$func($data);
+				}
 				else
 					$this->$func();
 			}
@@ -97,12 +126,27 @@
 				$this->response('',406);
 			}
 			if(isset($_REQUEST['n']) && $_REQUEST['n']!=""){
+				$f=null;
+				if(isset($_REQUEST['f']) && $_REQUEST['f']!=""){
+					$f=$_REQUEST['f'];
+				}
 				$n=$_REQUEST['n'];
 				if($n==="a"){
-					$this->sas_a($n);
+					$this->sas_a($n,$f);
 					return;
 				}
-				$q=$this->query($n);
+				elseif($n=="r"){
+					$q="SELECT _id,nom,flags FROM krole WHERE _id<>999";
+				}
+				elseif($n=="u"){
+					if(isset($_REQUEST['ri']) && $_REQUEST['ri']!=""){
+						$rid=$_REQUEST['ri'];
+						$q="SELECT _id,email,nom,app,apm FROM kusrs WHERE rid=$rid AND rid<>999";
+					}
+				}
+				else{
+					$q=$this->query($n);
+				}
 				if(!$q) return;
 			}
 			else{
@@ -133,7 +177,7 @@
 			}
 		}
 		
-		private function sas_a($n){
+		private function sas_a($n,$f){
 			$this->mysqli->query("SET NAMES 'utf8'");
 			$r=$this->mysqli->query($this->query("b"));
 			$b=array();
@@ -145,7 +189,20 @@
 			foreach($b as $i){
 				$_REQUEST['bid']=$i['bid'];
 				$this->mysqli->query("SET NAMES 'utf8'");
-				$r=$this->mysqli->query($this->query("a"));
+				$q="SELECT calum._id as id,calum.nom as nombre,calum.app as ap_p, calum.apm as ap_m,cbeca._id as bid,cbeca.nom as bnom,ccarr._id as cid,ccarr.nom as cnom,0 as showEdit FROM calum join cbeca on calum.bid=cbeca._id join ccarr on calum.cid=ccarr._id";
+				$q.=" WHERE 1=1 ";
+				if(isset($_REQUEST['bid']) && $_REQUEST['bid']!=""){
+					$q=$q." AND calum.bid=".$_REQUEST['bid'];
+				}
+				if(isset($_REQUEST['s']) && $_REQUEST['s']!="" && isset($_REQUEST['y']) && $_REQUEST['y']!=""){
+					$q=$q." AND calum.sem=".$_REQUEST['s'];
+					$q=$q." AND calum.yr=".$_REQUEST['y'];
+				}
+				if($f){
+					$q=$q." AND (calum._id LIKE '%$f%' OR calum.nom LIKE '%$f%' OR calum.app LIKE '%$f%' OR calum.apm LIKE '%$f%')";
+				}
+				$q=$q." ORDER BY cbeca._id,calum.app,calum.apm";
+				$r=$this->mysqli->query($q);
 				$h=array();
 				while($row=$r->fetch_assoc()){
 					$h[]=$row;
@@ -213,22 +270,36 @@
 			}
 		}
 		
-		private function waw(){
-			if($this->get_request_method() != "POST"){
-				$this->response('',406);
-			}
-			$data = json_decode(file_get_contents('php://input'), true);
+		private function waw($data){
 			if(isset($data['id']) && $data['id']!=""){
-				$id="'".$data['id']."'";
+				$id=$data['id'];
 			}
 			else{
 				$id="uuid()";
 			}
-			$q="INSERT calum(_id,nom,app,apm,sem,yr,bid,cid) VALUES ("
-				.$id.",'".$data['nom']."','".$data['ap_p']."','".$data['ap_m']."',".$data['sem'].",".$data['yr'].",".$data['bid'].",".$data['cid']
-				.")";
-			$this->mysqli->query("SET NAMES 'utf8'");
-			$r=$this->mysqli->query($q);
+			$id0=null;
+			if(isset($data['id0']) && $data['id0']!=""){
+				$id0=$data['id0'];
+			}
+			if($id0){
+				if($id0!==$id){
+					$q="UPDATE calum SET _id='$id' WHERE _id='$id0'";
+					$this->mysqli->query($q);
+				}
+				$q="UPDATE calum SET nom='".$data['nombre']."',app='".$data['ap_p']."',apm='".$data['ap_m']."',bid=".$data['bid'].",cid=".$data['cid'].",sem=".$data['sem'].",yr=".$data['yr']." WHERE _id='$id'";
+				$r=$this->mysqli->query($q);
+				if($this->mysqli->error){
+					$this->response(json_encode($this->mysqli->error),400);
+				}
+				else{
+					$this->response("",200);
+				}
+			}
+			else{
+				$q="INSERT calum(_id,nom,app,apm,sem,yr,bid,cid) VALUES ('$id','".$data['nom']."','".$data['ap_p']."','".$data['ap_m']."',".$data['sem'].",".$data['yr'].",".$data['bid'].",".$data['cid'].")";
+				$this->mysqli->query("SET NAMES 'utf8'");
+				$r=$this->mysqli->query($q);
+			}
 			if ($this->mysqli->error) {
 				$resp=array("q"=>$q,"err"=>$this->mysqli->error);
 				$this->response($this->json($resp),200);
@@ -351,10 +422,18 @@
 				$this->response('',400);
 			}
 			$f=$_FILES["fileUpload"]["tmp_name"];
+			if(!strstr($_FILES["fileUpload"]["name"],".csv")){
+				$this->response(json_encode("File has no 'csv' extension"),400);
+				return;
+			}
 			$lines_processed=0;
 			if(($g=fopen($f,"r"))!==false){
 				while(($l=fgetcsv($g,100,","))!==false){
 					$jcount=count($l);
+					if($jcount<=1){
+						$this->response(json_encode("File does not contain 'csv' data"),400);
+						return;						
+					}
 					$q="set @id={id};call sp_insAlum(@id,'{nom}','{app}','{apm}',{cid},{bid},2,2014,{si},{yri});select @id as id";
 					$qr=array();
 					$q__="INSERT rz00(aid,bid,sem,yr) SELECT {aid},{bid},{sem},{yr}";
@@ -436,7 +515,7 @@
 		}
 		
 		private function seek($s){
-			$q=$this->Q[4];
+			$q="SELECT calum.* FROM calum WHERE _id LIKE '%{q}%' OR nom LIKE '%{q}%' OR app LIKE '%{q}%' OR apm LIKE '%{q}%' ORDER BY calum.app,calum.apm,calum.nom";
 			$s=str_replace("'",null,$s);
 			$q=str_replace("{q}",$s,$q);
 			$r=$this->mysqli->query("SET NAMES 'utf8'");
@@ -524,5 +603,6 @@
 		
 	$api = new API;
 	ini_set('max_execution_time', 500);
+	date_default_timezone_set("America/Mexico_City");
 	$api->processApi();
 ?>

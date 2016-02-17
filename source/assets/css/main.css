@@ -1809,7 +1809,7 @@
 	  line-height: 20px;
 	  opacity: 1;
 	  padding: 10px;
-	  border: 1px solid black;
+	  border: .1em solid #007897;
 	  background: white;
 	}
 
@@ -1836,4 +1836,82 @@
 		direction: rtl;
 		overflow: scroll;
 		overflow-x: hidden!important;
+	}
+	
+	.actionBar{
+		border-top:.5px solid #007897;
+		border-bottom:.5px solid #007897;
+		margin:1em;
+		padding:.3em;
+	}
+	
+	input[type=text]{
+		padding:.1em; 
+		border:.1em solid #007b9d; 
+		-webkit-border-radius: 5px;
+		border-radius: 5px;
+		margin-top:.4em;
+		margin-bottom:.3em;
+	}
+
+	input[type=text]:focus {
+		border-color:#008dad;
+	}
+	
+	input[type=password]{
+		padding:.1em; 
+		border:.1em solid #007b9d; 
+		-webkit-border-radius: 5px;
+		border-radius: 5px;
+		margin-top:.4em;
+		margin-bottom:.3em;
+	}
+
+	input[type=password]:focus {
+		border-color:#008dad;
+	}
+	
+	select{
+		padding:.1em; 
+		border:.1em solid #007b9d; 
+		-webkit-border-radius: 5px;
+		border-radius: 5px;
+		margin-top:.4em;
+		margin-bottom:.3em;
+	}
+
+	select:focus {
+		border-color:#008dad;
+	}
+	
+	input[type=file] {
+		display:none;
+	}
+
+	input[type=submit] {
+		padding:.3em .5em; 
+		background:#007b9d; 
+		color:white;
+		border:0 none;
+		cursor:pointer;
+		-webkit-border-radius: 5px;
+		border-radius: 5px; 
+		margin-top:.4em;
+		margin-bottom:.3em;
+	}
+	
+	.custom-file-upload{
+		padding:.3em .5em; 
+		background:rgba(0, 147, 189, 0.24); 
+		color:black;
+		border:0 none;
+		cursor:pointer;
+		-webkit-border-radius: 5px;
+		border-radius: 5px; 
+		margin-top:.4em;
+		margin-bottom:.3em;
+	}
+	
+	#usersTable tr td{
+		padding:.2em;
 	}

@@ -37,20 +37,34 @@
 		 }
 	   };
 	});
-	dz.controller('BCTRL', ['$scope','$http','$cookies', function($scope,$http){
-			var ctrl=this;
-			$scope.title="";
-			$scope.currSemYr="Seleccionar";
-			$scope.canAdd=false;
-			$('#formdata').hide();
-			$('#altnomdiv').hide();
-			$http.get(endpoint+'?r=sas&n=b')
-				.success(function(data, status, headers, config) {
-					$scope.data2=data;
-					$('#wait2').hide();
-					}).
-			error(function(data, status, headers, config) {
-				   });
+	dz.controller('BCTRL', ['$scope','$http','$cookies', function($scope,$http,$cookies){
+		var ctrl=this;
+		if($cookies.get("sssnid")){
+			$scope.sssn=new Object();
+			$scope.sssn.id=$cookies.get("sssnid");
+			$scope.sssn.usr=$cookies.get("sssnusr");
+			$scope.sssn.flgs=$cookies.get("sssnflgs");
+			$scope.showSessionInfo=true;
+		}
+		else{
+			$scope.showSessionInfo=false;
+			window.location.replace("index.html");
+		}
+		$scope.title="";
+		$scope.currSemYr="Seleccionar";
+		$scope.canAdd=false;
+		$('#formdata').hide();
+		$('#altnomdiv').hide();
+		$http.get(endpoint+'?r=sas&n=b'+'&sssn='+$scope.sssn.id)
+			.success(function(data, status, headers, config) {
+				$scope.data2=data;
+				$('#wait2').hide();
+			})
+			.error(function(data, status, headers, config) {
+				if(status==401){
+					window.location.replace("index.html");
+				}
+			});
 		ctrl.bOnClick=function(b){
 			$scope.data3=b;
 			$scope.bshowform=false;
@@ -71,8 +85,19 @@
 			$scope.title=b.nom;
 		}
 	}]);
-	dz.controller('ACTRL', ['$scope','$http','$cookies', function($scope,$http,ngDialog){
+	dz.controller('ACTRL', ['$scope','$http','$cookies', function($scope,$http,$cookies,ngDialog){
 		var ctrl=this;
+		if($cookies.get("sssnid")){
+			$scope.sssn=new Object();
+			$scope.sssn.id=$cookies.get("sssnid");
+			$scope.sssn.usr=$cookies.get("sssnusr");
+			$scope.sssn.flgs=$cookies.get("sssnflgs");
+			$scope.showSessionInfo=true;
+		}
+		else{
+			$scope.showSessionInfo=false;
+			window.location.replace("index.html");
+		}
 		$scope.master = {};
 		$('.wait3').hide();
 		$('.ok-gif').hide();
@@ -107,15 +132,25 @@
 			$scope.reset();
 			$scope.showAddForm=!$scope.showAddForm;
 		};
-		$http.get(endpoint+'?r=sas&n=c')
+		$http.get(endpoint+'?r=sas&n=c'+'&sssn='+$scope.sssn.id)
 				.success(function(data, status, headers, config) {
 					$scope.data1=data;
-				});
-		$http.get(endpoint+'?r=sas&n=b')
+				})
+			.error(function(data, status, headers, config) {
+				if(status==401){
+					window.location.replace("index.html");
+				}
+			});
+		$http.get(endpoint+'?r=sas&n=b'+'&sssn='+$scope.sssn.id)
 			.success(function(data, status, headers, config) {
 				$scope.data2=data;
+			})
+			.error(function(data, status, headers, config) {
+				if(status==401){
+					window.location.replace("index.html");
+				}
 			});
-		$http.get(endpoint+'?r=sab&n=d')
+		$http.get(endpoint+'?r=sab&n=d'+'&sssn='+$scope.sssn.id)
 			.success(function(data, status, headers, config) {
 				$scope.data3=data;
 				$scope.formYearData = {
@@ -123,34 +158,47 @@
 					selectedOption: {sem: '2', year: '2016'}
 				};
 				$('#wait2').hide();
+			})
+			.error(function(data, status, headers, config) {
+				if(status==401){
+					window.location.replace("index.html");
+				}
 			});
-		$scope.ysOnClick=function(y,s){
+		$scope.seek=function(y,s,f){
 			$scope.data31=null;
 			$('#wait1').show();
 			$scope.canAdd=true;
 			$scope.currSem=s;
 			$scope.currYr=y;
 			$scope.currSemYr=' '+y+' - '+s;
-			$http.get(endpoint+'?r=sas&n=b')
+			$http.get(endpoint+'?r=sas&n=b'+'&sssn='+$scope.sssn.id)
 				.success(function(data, status, headers, config) {
 					$scope.data30=data;
-				});
-			$http.get(endpoint+'?r=sas&n=a&s='+s+'&y='+y)
-				.success(function(data, status, headers, config) {
-					 $scope.data31=data;
-					 $('#wait1').hide();
-					 })
+				})
 				.error(function(data, status, headers, config) {
-				   });
-			 }
+					if(status==401){
+						window.location.replace("index.html");
+					}
+				});
+			$http.get(endpoint+'?r=sas&n=a&s='+s+'&y='+y+'&sssn='+$scope.sssn.id+'&f='+(f||'%'))
+				.success(function(data, status, headers, config) {
+					$scope.data31=data;
+					$('#wait1').hide();
+				})
+				.error(function(data, status, headers, config) {
+					if(status==401){
+						window.location.replace("index.html");
+					}
+				});
+		}
 		$scope.updateA=function(a){
 			var data=$scope.a;
-			data.bid=$scope.mnuBecas.bid;
-			data.cid=$scope.mnuCarr.cid;
+			data.bid=$scope.mnuBecas?$scope.mnuBecas.bid:data.bid;
+			data.cid=$scope.mnuBecas?$scope.mnuBecas.cid:data.cid;
 			data.sem=$scope.currSem;
 			data.yr=$scope.currYr;
 			$('.wait3').show();
-			$http.post(endpoint+'?r=waw&n=a',data)
+			$http.post(endpoint+'?r=waw&n=a'+'&sssn='+$scope.sssn.id,data)
 				.success(function(data, status, headers, config) {
 					if(status==200){
 						$('.wait3').hide();
@@ -161,10 +209,15 @@
 							$('#submitok').hide();
 						}, 3000);
 					}
+				})
+				.error(function(data, status, headers, config) {
+					if(status==401){
+						window.location.replace("index.html");
+					}
 				});
 		}
 		$scope.deleteA=function(a){
-			$http.delete(endpoint+'?r=del&n=a&i='+a.id)
+			$http.delete(endpoint+'?r=del&n=a&i='+a.id+'&sssn='+$scope.sssn.id)
 				.success(function(data, status, headers, config) {
 					if(status==200){
 						ctrl.ysOnClick($scope.currYr,$scope.currSem);
@@ -173,14 +226,56 @@
 		}
 		$scope.scope=function(a){
 			$scope.a=a;
+			$scope.a.id0=a.id;
 		}
-		}]);
+		$scope.submitCsv=function(){
+			$('.wait3').show();
+			var f=document.getElementById('fileUpload').files[0];
+			if(!f){
+				$('.wait3').hide();
+				return;
+			}
+			var freader = new FileReader();
+			freader.onloadend = function(e){
+				var data = e.target.result;
+				$http.post(endpoint+'?r=fcsv&s='+$scope.currSem+'&y='+$scope.currYr+'&sssn='+$scope.sssn.id,data)
+					.success(function(data, status, headers, config) {
+						$('.wait-div').hide();
+						if(status==200){
+							$('.ok-gif').show();
+							setTimeout(function() {
+								$('.ok-gif').hide();
+							}, 3000);
+						}
+					})
+					.error(function(data, status, headers, config) {
+						$('.wait3').hide();
+						$scope.srvrMsg=data;
+						if(status==401){
+							window.location.replace("index.html");
+						}
+					});
+			}
+			freader.readAsBinaryString(f);
+		}
+	}]);
 			 
-	dz.controller('STACTRL', ['$scope','$http','$cookies', function($scope,$http){
+	dz.controller('STACTRL', ['$scope','$http','$cookies', function($scope,$http,$cookies){
 		$scope.title="";
+		if($cookies.get("sssnid")){
+			$scope.sssn=new Object();
+			$scope.sssn.id=$cookies.get("sssnid");
+			$scope.sssn.usr=$cookies.get("sssnusr");
+			$scope.sssn.flgs=$cookies.get("sssnflgs");
+			$scope.showSessionInfo=true;
+		}
+		else{
+			$scope.showSessionInfo=false;
+			window.location.replace("index.html");
+		}
 		
 		$scope.xy=function(a){
-			$http.get(endpoint+'?r=sta&n='+a)
+			$http.get(endpoint+'?r=sta&n='+a+'&sssn='+$scope.sssn.id)
 				.success(function(data, status, headers, config) {
 					if(status==200){
 						//var chart = new CanvasJS.Chart("chartContainer", {"title":"","data":[{"dataPoints":[{"label":"(Sin beca)","y":54},{"label":"Institucional A","y":0},{"label":"Institucional B","y":0},{"label":"Institucional C","y":0},{"label":"Pronabes","y":12},{"label":"B\u00e9calos","y":1},{"label":"h-h","y":0},{"label":"Telmex","y":0},{"label":"Alto Rendimiento","y":0},{"label":"Probeup","y":2}],"type":"spline"}]});
@@ -191,12 +286,23 @@
 			
 		}
 	}]);
-	dz.controller('LINTMPCTRL', ['$scope','$http','$cookies', function($scope,$http){
+	dz.controller('LINTMPCTRL', ['$scope','$http','$cookies', function($scope,$http,$cookies){
 		$scope.title="";
+		if($cookies.get("sssnid")){
+			$scope.sssn=new Object();
+			$scope.sssn.id=$cookies.get("sssnid");
+			$scope.sssn.usr=$cookies.get("sssnusr");
+			$scope.sssn.flgs=$cookies.get("sssnflgs");
+			$scope.showSessionInfo=true;
+		}
+		else{
+			$scope.showSessionInfo=false;
+			window.location.replace("index.html");
+		}
 		$('#wait1').hide();
 		$scope.xy=function(a){
 			$scope.a=a;
-			$http.get(endpoint+'?r=stq&n='+a._id)
+			$http.get(endpoint+'?r=stq&n='+a._id+'&sssn='+$scope.sssn.id)
 				.success(function(data, status, headers, config) {
 					if(status==200){
 						/*var chart = new CanvasJS.Chart("chartContainer"
@@ -269,17 +375,18 @@
 		$scope.search=function(q){
 			$('#wait1').show();
 			if(!q)q='%';
-			$http.get(endpoint+'?r=seek&q='+q)
+			$http.get(endpoint+'?r=seek&q='+q+'&sssn='+$scope.sssn.id)
 				.success(function(data, status, headers, config) {
 					if(status==200){
 						$scope.data1=data;
 						$('#wait1').hide();
 					}
-			});
+				});
 		}
 	}]);
 	dz.controller('LCTRL', ['$scope','$http','$cookies', function($scope,$http,$cookies){
 		$scope.showLoginErrMsg=false;
+		$scope.showControlPanel=false;
 		$scope.mnu=new Object();
 		if($cookies.get("sssnid")){
 			$scope.sssn=new Object();
@@ -291,6 +398,9 @@
 			$scope.mnu.e="estadisticas.html";
 			$scope.mnu.b="becas.html";
 			$scope.mnu.l="lineatiempo.html";
+			if(parseInt($scope.sssn.flgs)>=5){
+				$scope.showControlPanel=true;
+			}
 		}
 		else{
 			$scope.showSessionInfo=false;	
@@ -321,6 +431,15 @@
 						$scope.sssn.usr=$cookies.get("sssnusr");
 						$scope.sssn.flgs=$cookies.get("sssnflgs");
 						$scope.showSessionInfo=true;
+						if(parseInt($scope.sssn.flgs)>=5){
+							$scope.showControlPanel=true;
+							$http.get(endpoint+'?r=sas&n=r&sssn='+$scope.sssn.id)
+								.success(function(data, status, headers, config) {
+									$scope.rdata=data;
+								})
+								.error(function(data, status, headers, config) {
+								});
+						}
 					}
 				})
 				.error(function(data, status, headers, config) {
@@ -328,6 +447,21 @@
 						$scope.showLoginErrMsg=true;
 					}
 				});;
+		}
+		$scope.endSession=function(){
+			$cookies.remove("sssnid");
+			$cookies.remove("sssnusr");
+			$cookies.remove("sssnflgs");
+			$scope.showSessionInfo=false;	
+			$scope.showControlPanel=false;
+		}
+		$scope.listUsers=function(r){
+			$http.get(endpoint+'?r=sas&n=u&ri='+r+'&sssn='+$scope.sssn.id)
+				.success(function(data, status, headers, config) {
+					$scope.udata=data;
+				})
+				.error(function(data, status, headers, config) {
+				});
 		}
 	}]);
   })();
