@@ -94,26 +94,35 @@
 								<ul class="small-image-list">
 									<li ng-repeat="s in rdata.data">
 										<a href="#"><img src="images/pic2.jpg" alt="" class="left" /></a>
-										<a href="" ng-click="listUsers(s._id)"><h4>{{s.nom}}</h4></a>
-										<input type="checkbox" ng-model="accs.a" value="Bike">A
-										<input type="checkbox" name="accs.b" value="Bike">B
-										<input type="checkbox" name="accs.e" value="Bike">E
-										<input type="checkbox" name="accs.lt" value="Bike">LT
-										<p>fl={{s.flags}}</p>
+										<form>
+											<ul class="inline">
+												<li><a href="" ng-click="listUsers(s._id)"><span>{{s.nom}}</span></a></li>
+												<li><a href="" ng-click="showEditRoleForm"><img src="images/edit.png" style="height:15px;width:15px;" data-toggle="tooltip" title="Editar"/></a></li>
+												<li><a href="" ng-click="saveRole(s,accs)"><img src="images/save.png" style="height:18px;width:18px;" data-toggle="tooltip" title="Guardar"/></a></li>
+											</ul>
+											<span>Accesos:</span>
+											<input type="checkbox" ng-model="accs.a" ng-true-value="8" ng-false-value="0" ng-checked="logicalAnd(8,s.flags)" data-toggle="tooltip" title="Alumnos">A</input>
+											<input type="checkbox" ng-checked="logicalAnd(4,s.flags)" ng-model="accs.b" ng-true-value="4" ng-false-value="0"  data-toggle="tooltip" title="Becas">B</input>
+											<input type="checkbox" ng-checked="logicalAnd(2,s.flags)" ng-model="accs.e" ng-true-value="2" ng-false-value="0" data-toggle="tooltip" title="Estadísticas">E</input>
+											<input type="checkbox" ng-checked="logicalAnd(1,s.flags)" ng-model="accs.lt" ng-true-value="1" ng-false-value="0" data-toggle="tooltip" title="Línea del tiempo">LT</input>
+											fl={{accs.a+accs.b+accs.e+accs.lt}}
+										</form>
 									</li>
+									<li><a href="" ng-click="showAddRoleForm" style="padding-left:1em;">Agregar</a></li>
+									<li></li>
 								</ul>
 							</section>
 
 						</div>
 						<div class="4u 12u(mobile)">
 							<section>
-								<h3>Usuarios</h3>
+								<h3>Usuarios asignados</h3>
 								<div>
 									<div class="row">
 										<div class="6u 12u(mobile)">
 											<ul class="link-list">
 												<li ng-repeat="u in udata.data">
-													<table id="usersTable"><tr><td><a href="">{{u._id}}</a></td><td>{{u.nom}}</td><td>{{u.app}}</td><td>{{u.apm}}</td><td>{{u.email}}</td><td><a href="">z</a></td></tr></table>
+													<table id="usersTable"><tr><td><a href="">{{u._id}}</a></td><td>{{u.nom}}</td><td>{{u.app}}</td><td>{{u.apm}}</td><td>{{u.email}}</td><td><a href="" data-toggle="tooltip" title="Reestablecer contraseña">z</a></td></tr></table>
 												</li>
 											</ul>
 										</div>
@@ -123,6 +132,7 @@
 
 						</div>
 					</div>
+					<!--
 					<div class="row main-row">
 						<div class="6u 12u(mobile)">
 
@@ -184,56 +194,10 @@
 
 						</div>
 					</div>
+					-->
 				</div>
 			</div>
-            
-			<div id="footer-wrapper">
-				<div class="container">
-					<div class="row">
-						<div class="8u 12u(mobile)">
-
-							<section>
-								<h2>Enlaces</h2>
-								<div>
-									<div class="row">
-										<div class="3u 12u(mobile)">
-											<ul class="link-list">
-												<li><a href="http://upiita.ipn.mx">upiita.ipn.mx</a></li>
-											</ul>
-										</div>
-									</div>
-								</div>
-							</section>
-
-						</div>
-                        <!--
-						<div class="4u 12u(mobile)">
-
-							<section>
-								<h2>Something of interest</h2>
-								<p>Duis neque nisi, dapibus sed mattis quis, rutrum accumsan sed.
-								Suspendisse eu varius nibh. Suspendisse vitae magna eget odio amet
-								mollis justo facilisis quis. Sed sagittis mauris amet tellus gravida
-								lorem ipsum dolor sit amet consequat blandit.</p>
-								<footer class="controls">
-									<a href="#" class="button">Oh, please continue ....</a>
-								</footer>
-							</section>
-
-						</div>-->
-					</div>
-					<div class="row">
-						<div class="12u">
-
-							<div id="copyright">
-								<p> Avenida Instituto Politécnico Nacional No. 2580, Col Barrio la Laguna Ticomán, Gustavo A. Madero, México D.F., C.P. 07340.Tels.: 57296000, ext. 56806</p>
-                                &copy; Upiita IPN. México.
-                            </div>
-
-						</div>
-					</div>
-				</div>
-			</div>
+            <ng-include src="'common_footer.html'"/>
 		</div>
 
 	</body>

@@ -194,7 +194,7 @@
 		$scope.updateA=function(a){
 			var data=$scope.a;
 			data.bid=$scope.mnuBecas?$scope.mnuBecas.bid:data.bid;
-			data.cid=$scope.mnuBecas?$scope.mnuBecas.cid:data.cid;
+			data.cid=$scope.mnuCarr?$scope.mnuCarr.cid:data.cid;
 			data.sem=$scope.currSem;
 			data.yr=$scope.currYr;
 			$('.wait3').show();
@@ -204,9 +204,9 @@
 						$('.wait3').hide();
 						$('.ok-gif').show();
 						$scope.reset();
-						ctrl.ysOnClick($scope.currYr,$scope.currSem);
+						$scope.seek($scope.currYr,$scope.currSem);
 						setTimeout(function() {
-							$('#submitok').hide();
+							$('.ok-gif').hide();
 						}, 3000);
 					}
 				})
@@ -220,7 +220,7 @@
 			$http.delete(endpoint+'?r=del&n=a&i='+a.id+'&sssn='+$scope.sssn.id)
 				.success(function(data, status, headers, config) {
 					if(status==200){
-						ctrl.ysOnClick($scope.currYr,$scope.currSem);
+						$scope.seek($scope.currYr,$scope.currSem);
 					}
 				});
 		}
@@ -431,15 +431,7 @@
 						$scope.sssn.usr=$cookies.get("sssnusr");
 						$scope.sssn.flgs=$cookies.get("sssnflgs");
 						$scope.showSessionInfo=true;
-						if(parseInt($scope.sssn.flgs)>=5){
-							$scope.showControlPanel=true;
-							$http.get(endpoint+'?r=sas&n=r&sssn='+$scope.sssn.id)
-								.success(function(data, status, headers, config) {
-									$scope.rdata=data;
-								})
-								.error(function(data, status, headers, config) {
-								});
-						}
+						$scope.checkFlags();
 					}
 				})
 				.error(function(data, status, headers, config) {
@@ -447,6 +439,17 @@
 						$scope.showLoginErrMsg=true;
 					}
 				});;
+		}
+		$scope.checkFlags=function(){
+			if($scope.sssn && parseInt($scope.sssn.flgs)>=15){
+				$scope.showControlPanel=true;
+				$http.get(endpoint+'?r=sas&n=r&sssn='+$scope.sssn.id)
+					.success(function(data, status, headers, config) {
+						$scope.rdata=data;
+					})
+					.error(function(data, status, headers, config) {
+					});
+			}
 		}
 		$scope.endSession=function(){
 			$cookies.remove("sssnid");
@@ -463,5 +466,19 @@
 				.error(function(data, status, headers, config) {
 				});
 		}
+		$scope.saveRole=function(s,accs){
+			if(s){
+				
+			}
+		}
+		$scope.logicalAnd=function(a,b){
+			return a&b;
+		}
+		$scope.calcAccs=function(a){
+			if(a){
+				
+			}
+		}
+		$scope.checkFlags();
 	}]);
   })();

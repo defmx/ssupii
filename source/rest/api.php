@@ -272,7 +272,7 @@
 		
 		private function waw($data){
 			if(isset($data['id']) && $data['id']!=""){
-				$id=$data['id'];
+				$id="'".$data['id']."'";
 			}
 			else{
 				$id="uuid()";
@@ -296,7 +296,7 @@
 				}
 			}
 			else{
-				$q="INSERT calum(_id,nom,app,apm,sem,yr,bid,cid) VALUES ('$id','".$data['nom']."','".$data['ap_p']."','".$data['ap_m']."',".$data['sem'].",".$data['yr'].",".$data['bid'].",".$data['cid'].")";
+				$q="INSERT calum(_id,nom,app,apm,sem,yr,bid,cid) VALUES ($id,'".$data['nom']."','".$data['ap_p']."','".$data['ap_m']."',".$data['sem'].",".$data['yr'].",".$data['bid'].",".$data['cid'].")";
 				$this->mysqli->query("SET NAMES 'utf8'");
 				$r=$this->mysqli->query($q);
 			}

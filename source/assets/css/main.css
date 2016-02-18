@@ -1915,3 +1915,8 @@
 	#usersTable tr td{
 		padding:.2em;
 	}
+	
+	.inline li{
+		display:inline;
+		margin-left:.4em;
+	}
