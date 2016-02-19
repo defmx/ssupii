@@ -112,7 +112,10 @@
 						$this->response('',406);
 					}
 					$data = json_decode(file_get_contents('php://input'), true);
-					$this->$func($data);
+					if(isset($_REQUEST['n']) && $_REQUEST['n']!=""){
+						$w=$_REQUEST['n'];
+					}
+					$this->$func($data,$w);
 				}
 				else
 					$this->$func();
@@ -136,12 +139,12 @@
 					return;
 				}
 				elseif($n=="r"){
-					$q="SELECT _id,nom,flags FROM krole WHERE _id<>999";
+					$q="SELECT _id,nom,flags FROM krole WHERE _id>0";
 				}
 				elseif($n=="u"){
 					if(isset($_REQUEST['ri']) && $_REQUEST['ri']!=""){
 						$rid=$_REQUEST['ri'];
-						$q="SELECT _id,email,nom,app,apm FROM kusrs WHERE rid=$rid AND rid<>999";
+						$q="SELECT _id,email,nom,app,apm FROM kusrs WHERE rid=$rid AND rid>0";
 					}
 				}
 				else{
@@ -270,7 +273,11 @@
 			}
 		}
 		
-		private function waw($data){
+		private function waw($data,$w){
+			if($w&&$w=="r"){
+				$this->waw_r($data);
+				return;
+			}
 			if(isset($data['id']) && $data['id']!=""){
 				$id="'".$data['id']."'";
 			}
@@ -309,6 +316,22 @@
 				$this->response('', 200);
 			}
 			$this->mysqli->close();
+		}
+		
+		private function waw_r($data){
+			if(isset($data['_id'])&&$data['_id']){
+				$q="UPDATE krole SET nom='".$data['nom']."',flags=".$data['flags']." WHERE _id=".$data['_id'];				
+			}
+			else{
+				$q="INSERT krole(nom,flags) SELECT '".$data['nom']."',".$data['flags'];
+			}
+			$this->mysqli->query($q);
+			if($this->mysqli->error){
+				$this->response(json_encode($this->mysqli->error),404);
+			}
+			else{
+				$this->response("",200);
+			}
 		}
 		
 		private function del(){

@@ -1916,6 +1916,10 @@
 		padding:.2em;
 	}
 	
+	.inline{
+		display:inline;
+	}
+	
 	.inline li{
 		display:inline;
 		margin-left:.4em;

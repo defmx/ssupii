@@ -441,11 +441,18 @@
 				});;
 		}
 		$scope.checkFlags=function(){
-			if($scope.sssn && parseInt($scope.sssn.flgs)>=15){
+			if($scope.sssn && parseInt($scope.sssn.flgs)&&32){
 				$scope.showControlPanel=true;
 				$http.get(endpoint+'?r=sas&n=r&sssn='+$scope.sssn.id)
 					.success(function(data, status, headers, config) {
 						$scope.rdata=data;
+						for(var s in $scope.rdata.data){
+							var fl=$scope.rdata.data[s].flags;
+							$scope.rdata.data[s].a=fl&8;
+							$scope.rdata.data[s].b=fl&4;
+							$scope.rdata.data[s].e=fl&2;
+							$scope.rdata.data[s].lt=fl&1;
+						}
 					})
 					.error(function(data, status, headers, config) {
 					});
@@ -466,15 +473,33 @@
 				.error(function(data, status, headers, config) {
 				});
 		}
-		$scope.saveRole=function(s,accs){
-			if(s){
-				
+		$scope.saveRole=function(s){
+			$('#rsave'+s._id).hide();
+			$('#rwait'+s._id).show();
+			if(s.flags){
+				s.flags=s.a+s.b+s.e+s.lt;
 			}
+			else{
+				s.flags=0;
+			}
+			$http.post(endpoint+'?r=waw&n=r&sssn='+$scope.sssn.id,s)
+				.success(function(data, status, headers, config) {
+					if(status==200){
+						$('#rsave'+s._id).show();
+						$('#rwait'+s._id).hide();	
+						$scope.checkFlags();
+					}
+				})
+				.error(function(data, status, headers, config) {
+					if(status==401){
+						
+					}
+				});
 		}
 		$scope.logicalAnd=function(a,b){
 			return a&b;
 		}
-		$scope.calcAccs=function(a){
+		$scope.flags=function(a){
 			if(a){
 				
 			}

@@ -97,19 +97,28 @@
 										<form>
 											<ul class="inline">
 												<li><a href="" ng-click="listUsers(s._id)"><span>{{s.nom}}</span></a></li>
-												<li><a href="" ng-click="showEditRoleForm"><img src="images/edit.png" style="height:15px;width:15px;" data-toggle="tooltip" title="Editar"/></a></li>
-												<li><a href="" ng-click="saveRole(s,accs)"><img src="images/save.png" style="height:18px;width:18px;" data-toggle="tooltip" title="Guardar"/></a></li>
+												 ( <li><a href="" ng-click="showEditRoleForm"><img src="images/edit.png" style="height:15px;width:15px;" data-toggle="tooltip" title="Editar"/></a></li>
+												<li><a href="" ng-click="saveRole(s)"><img id="{{'rsave'+s._id}}" src="images/save.png" style="height:18px;width:18px;" data-toggle="tooltip" title="Guardar"/></a></li>
+												<li><img src="images/loading_spinner.gif" id="{{'rwait'+s._id}}" style="height:18px;width:18px;display:none;" data-toggle="tooltip" title="Guardar"/></li>
+												  )
 											</ul>
-											<span>Accesos:</span>
-											<input type="checkbox" ng-model="accs.a" ng-true-value="8" ng-false-value="0" ng-checked="logicalAnd(8,s.flags)" data-toggle="tooltip" title="Alumnos">A</input>
-											<input type="checkbox" ng-checked="logicalAnd(4,s.flags)" ng-model="accs.b" ng-true-value="4" ng-false-value="0"  data-toggle="tooltip" title="Becas">B</input>
-											<input type="checkbox" ng-checked="logicalAnd(2,s.flags)" ng-model="accs.e" ng-true-value="2" ng-false-value="0" data-toggle="tooltip" title="Estadísticas">E</input>
-											<input type="checkbox" ng-checked="logicalAnd(1,s.flags)" ng-model="accs.lt" ng-true-value="1" ng-false-value="0" data-toggle="tooltip" title="Línea del tiempo">LT</input>
-											fl={{accs.a+accs.b+accs.e+accs.lt}}
+											<br><br>
+											<div class="inline">
+											<input type="checkbox" ng-checked="logicalAnd(8,s.flags)" ng-model="s.a" ng-true-value="8" ng-false-value="0" data-toggle="tooltip" title="Alumnos">A</input>
+											<input type="checkbox" ng-checked="logicalAnd(4,s.flags)" ng-model="s.b" ng-true-value="4" ng-false-value="0"  data-toggle="tooltip" title="Becas">B</input>
+											<input type="checkbox" ng-checked="logicalAnd(2,s.flags)" ng-model="s.e" ng-true-value="2" ng-false-value="0" data-toggle="tooltip" title="Estadísticas">E</input>
+											<input type="checkbox" ng-checked="logicalAnd(1,s.flags)" ng-model="s.lt" ng-true-value="1" ng-false-value="0" data-toggle="tooltip" title="Línea del tiempo">LT</input>
+											</div>
+											<!--<span> fl={{s.a+s.b+s.e+s.lt}}</span>-->
 										</form>
 									</li>
-									<li><a href="" ng-click="showAddRoleForm" style="padding-left:1em;">Agregar</a></li>
-									<li></li>
+								</ul><hr/>
+								<ul>
+									<li><a href="" ng-click="showAddRoleForm=!showAddRoleForm" style="padding-left:1em;">Agregar</a></li>
+									<li ng-show="showAddRoleForm">
+										Rol nuevo (  <a href="" ng-click="saveRole(s)"><img id="{{'rsave'+s._id}}" src="images/save.png" style="height:18px;width:18px;" data-toggle="tooltip" title="Guardar"/></a>  )
+										<input type="text" ng-model="s.nom" size="10" placeholder="nombre"/>
+									</li>
 								</ul>
 							</section>
 
@@ -120,9 +129,13 @@
 								<div>
 									<div class="row">
 										<div class="6u 12u(mobile)">
-											<ul class="link-list">
+											<ul>
 												<li ng-repeat="u in udata.data">
 													<table id="usersTable"><tr><td><a href="">{{u._id}}</a></td><td>{{u.nom}}</td><td>{{u.app}}</td><td>{{u.apm}}</td><td>{{u.email}}</td><td><a href="" data-toggle="tooltip" title="Reestablecer contraseña">z</a></td></tr></table>
+												</li><hr/>
+												<li><a href="" ng-click="showAddUserForm=!showAddUserForm" style="padding-left:1em;">Agregar</a></li>
+												<li ng-show="showAddUserForm">
+													Usuario nuevo (  <a href="" ng-click="saveRole(s)"><img id="{{'rsave'+s._id}}" src="images/save.png" style="height:18px;width:18px;" data-toggle="tooltip" title="Guardar"/></a>  )
 												</li>
 											</ul>
 										</div>
