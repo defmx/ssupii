@@ -1074,14 +1074,14 @@
 	body {
 		font-size: 13.5pt;
 		font-family: sans-serif;
-		background-color: #e3e9dc;
+		background-color: #FFFFFF;
 		font-family: 'Ubuntu Condensed', sans-serif;
 		color: #878e83;
 		letter-spacing: -1px;
 	}
 
 	h1, h2, h3, h4 {
-		color: #007897;
+		color: #820000;
 		font-weight: normal;
 	}
 
@@ -1260,18 +1260,18 @@
 		/* Header */
 
 			#header-wrapper {
-				background-image: -moz-linear-gradient(top, #008dab, #007294);
-				background-image: -webkit-linear-gradient(top, #008dab, #007294);
-				background-image: -ms-linear-gradient(top, #008dab, #007294);
-				background-image: linear-gradient(top, #008dab, #007294);
-				background-color: #007294;
+				background-image: -moz-linear-gradient(top, #561E1E, #943737);
+				background-image: -webkit-linear-gradient(top, #561E1E, #943737);
+				background-image: -ms-linear-gradient(top, #561E1E, #943737);
+				background-image: linear-gradient(top, #561E1E, #943737);
+				background-color: #943737;
 			}
 
 			#header {
-				background-image: -moz-linear-gradient(top, #008ead, #007b9d);
-				background-image: -webkit-linear-gradient(top, #008ead, #007b9d);
-				background-image: -ms-linear-gradient(top, #008ead, #007b9d);
-				background-image: linear-gradient(top, #008ead, #007b9d);
+				background-image: -moz-linear-gradient(top, #8C2B2B, #801D1D);
+				background-image: -webkit-linear-gradient(top, #8C2B2B, #801D1D);
+				background-image: -ms-linear-gradient(top, #8C2B2B, #801D1D);
+				background-image: linear-gradient(top, #8C2B2B, #801D1D);
 				-moz-box-sizing: content-box;
 				-webkit-box-sizing: content-box;
 				-ms-box-sizing: content-box;
@@ -1280,10 +1280,8 @@
 				margin: 2.5% 0 2.5% 0;
 				padding: 0 40px 0 40px;
 				border-radius: 10px;
-				border: solid 1px #006e8b;
-				box-shadow: inset 0px 0px 0px 1px #12a0bf, 0px 1px 4px 0px rgba(0, 0, 0, 0.1);
-				background-color: #007b9d;
-				height: 86px;
+				background-color: #801D1D;
+				height: 120px;
 			}
 
 				#header h1 {
@@ -1312,7 +1310,7 @@
 				}
 
 					#header nav a {
-						display: inline-block;
+						display: inline;
 						text-decoration: none;
 						color: #fff;
 						padding: 0 25px 0 25px;
@@ -1320,20 +1318,78 @@
 					}
 
 						#header nav a.current-page-item {
-							background-image: -moz-linear-gradient(top, #007b99, #007897);
-							background-image: -webkit-linear-gradient(top, #007b99, #007897);
-							background-image: -ms-linear-gradient(top, #007b99, #007897);
-							background-image: linear-gradient(top, #007b99, #007897);
-							background-color: #007897;
+							background-image: -moz-linear-gradient(top, #400202, #770000);
+							background-image: -webkit-linear-gradient(top, #400202, #770000);
+							background-image: -ms-linear-gradient(top, #400202, #770000);
+							background-image: linear-gradient(top, #400202, #770000);
+							background-color: #400202;
 							box-shadow: inset 0px 1px 5px 1px rgba(0, 0, 0, 0.1), 0px 0px 5px 1px rgba(255, 255, 255, 0.1);
 						}
 
 						#header nav a:hover {
-							background-image: -moz-linear-gradient(top, #0782a0, #077d9b);
-							background-image: -webkit-linear-gradient(top, #0782a0, #077d9b);
-							background-image: -ms-linear-gradient(top, #0782a0, #077d9b);
-							background-image: linear-gradient(top, #0782a0, #077d9b);
-							background-color: #0882a1;
+							text-shadow: .1px .1px #FFFFFF;
+							box-shadow: inset 0px 1px 5px 1px rgba(0, 0, 0, 0.05), 0px 0px 5px 1px rgba(255, 255, 255, 0.05);
+						}
+						
+		#header2 {
+				background-image: -moz-linear-gradient(top, #8C2B2B, #801D1D);
+				background-image: -webkit-linear-gradient(top, #8C2B2B, #801D1D);
+				background-image: -ms-linear-gradient(top, #8C2B2B, #801D1D);
+				background-image: linear-gradient(top, #8C2B2B, #801D1D);
+				-moz-box-sizing: content-box;
+				-webkit-box-sizing: content-box;
+				-ms-box-sizing: content-box;
+				box-sizing: content-box;
+				position: relative;
+				margin: 2.5% 0 2.5% 0;
+				padding: 0 40px 0 40px;
+				box-shadow: inset 0px 0px 0px 1px #580000, 0px 1px 4px 0px rgba(0, 0, 0, 0.1);
+				background-color: #801D1D;
+				height: 30px;
+				margin-left:25em;
+				border-radius:.5em;
+			}
+
+				#header2 h1 {
+					position: absolute;
+					left: 40px;
+					top: 0;
+					color: #fff;
+					font-size: 2.4em;
+					letter-spacing: -2px;
+					line-height: 30px;
+				}
+
+					#header2 h1 a {
+						color: #fff;
+						text-decoration: none;
+					}
+
+				#header2 nav {
+					position: absolute;
+					right: 40px;
+					top: 1px;
+					line-height: 30px;
+					text-transform: lowercase;
+					font-size: 1.3em;
+					letter-spacing: -1px;
+				}
+
+					#header2 nav a {
+						display: inline;
+						text-decoration: none;
+						color: #fff;
+						padding: 0px 25px 0px 25px;
+						outline: 0;
+					}
+
+						#header2 nav a.current-page-item {
+							text-shadow: 1.5px 1.5px #000000;
+						}
+
+						#header2 nav a:hover {
+							text-shadow: .1px .1px #FFFFFF;
+							border-radius:.4em;
 							box-shadow: inset 0px 1px 5px 1px rgba(0, 0, 0, 0.05), 0px 0px 5px 1px rgba(255, 255, 255, 0.05);
 						}
 
@@ -1438,7 +1494,7 @@
 		/* Header */
 
 			#header {
-				height: 76px;
+				height: 150px;
 			}
 
 				#header h1 {
@@ -1454,7 +1510,21 @@
 					#header nav a {
 						padding: 0 20px 0 20px;
 					}
+			
+			#header2 {
+				height: 30px;
+				margin-left:20em;
+				border-radius:.5em;
+			}
+			
+			#header2 nav {
+					line-height: 30px;
+					font-size: 1.1em;
+				}
 
+					#header2 nav a {
+						padding: 0 20px 0 20px;
+					}
 		/* Banner */
 
 			#banner {
@@ -1802,7 +1872,19 @@
 	
 	#upiitalogo{
 		width:100px;
-		height:65	px;
+		margin:1em 2em 0em 0em;
+		float:right;
+	}
+	
+	#ipnlogo{
+		width:50px;
+		margin:1em 0em 0em 0em;
+		float:right;
+	}
+	
+	#seplogo{
+		width:170px;
+		margin-top:1em;
 	}
 	
 	.animate-show {
@@ -1847,7 +1929,7 @@
 	
 	input[type=text]{
 		padding:.1em; 
-		border:.1em solid #007b9d; 
+		border:.1em solid #800000; 
 		-webkit-border-radius: 5px;
 		border-radius: 5px;
 		margin-top:.4em;
@@ -1855,12 +1937,12 @@
 	}
 
 	input[type=text]:focus {
-		border-color:#008dad;
+		border-color:#800000;
 	}
 	
 	input[type=password]{
 		padding:.1em; 
-		border:.1em solid #007b9d; 
+		border:.1em solid #800000; 
 		-webkit-border-radius: 5px;
 		border-radius: 5px;
 		margin-top:.4em;
@@ -1868,12 +1950,12 @@
 	}
 
 	input[type=password]:focus {
-		border-color:#008dad;
+		border-color:#800000;
 	}
 	
 	select{
 		padding:.1em; 
-		border:.1em solid #007b9d; 
+		border:.1em solid #800000; 
 		-webkit-border-radius: 5px;
 		border-radius: 5px;
 		margin-top:.4em;
@@ -1881,7 +1963,7 @@
 	}
 
 	select:focus {
-		border-color:#008dad;
+		border-color:#800000;
 	}
 	
 	input[type=file] {
@@ -1890,7 +1972,7 @@
 
 	input[type=submit] {
 		padding:.3em .5em; 
-		background:#007b9d; 
+		background:#800000; 
 		color:white;
 		border:0 none;
 		cursor:pointer;
@@ -1923,4 +2005,10 @@
 	.inline li{
 		display:inline;
 		margin-left:.4em;
+	}
+	
+	pre{
+		color:inherit;
+		background-color:inherit;
+		overflow:inherit;
 	}

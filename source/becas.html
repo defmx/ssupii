@@ -28,23 +28,28 @@
 			<div id="header-wrapper">
 				<div class="container">
 					<div class="row">
-                        <div class="12u">
-                            <header id="header">
+						<div class="12u">
+							<header id="header">
 								<div id="logo-array">
 									<ul>
+										<li><img id="ipnlogo" src="images/ipnwhitelogo.png"/></li>
+										<li><h5 style="float:right;margin:35px 10px 0px 0px;font-size:1.1em;text-decoration:underline;color:#FFFFFF">Instituto Politécnico Nacional</h5></li>
+										<li><h5 style="float:right;margin:60px -150px 0px 0px;font-size:.8em;text-decoration:underline;color:#FFFFFF">"La técnica al servicio de la patria"</h5></li>
 										<li><img id="upiitalogo" src="images/logo.png"/></li>
-										<li><h1><a href="#" id="logo"></a></h1></li>
+										<li><img id="seplogo" src="images/seplogo.png"/></li>
 									</ul>
 								</div>
-                                <nav id="nav">
-                                    <a href="index.html">Inicio</a>
-                                    <a href="alumnos.html">Alumnos</a>
-                                    <a href="estadisticas.html">Estadísticas</a>
-                                    <a href="becas.html" class="current-page-item">Becas</a>
+							</header>
+							<header id="header2">
+								<nav id="nav">
+									<a href="index.html">Inicio</a>
+									<a href="alumnos.html">Alumnos</a>
+									<a href="estadisticas.html">Estadísticas</a>
+									<a href="becas.html" class="current-page-item">Becas</a>
 									<a href="lineatiempo.html">Línea del tiempo</a>
-                                </nav>
-                            </header>
-
+								</nav>
+							</header>
+							<pre style="padding:0px 0px 10px 10px" ng-show="showSessionInfo">Sesión iniciada: ({{sssn.usr}})      <a href="" ng-click="endSession()">~</a></pre>
 						</div>
 					</div>
 				</div>

@@ -279,7 +279,7 @@
 				return;
 			}
 			if(isset($data['id']) && $data['id']!=""){
-				$id="'".$data['id']."'";
+				$id=$data['id'];
 			}
 			else{
 				$id="uuid()";
@@ -303,6 +303,8 @@
 				}
 			}
 			else{
+				if($id!=="uuid()")
+					$id="'".$id."'";
 				$q="INSERT calum(_id,nom,app,apm,sem,yr,bid,cid) VALUES ($id,'".$data['nom']."','".$data['ap_p']."','".$data['ap_m']."',".$data['sem'].",".$data['yr'].",".$data['bid'].",".$data['cid'].")";
 				$this->mysqli->query("SET NAMES 'utf8'");
 				$r=$this->mysqli->query($q);
@@ -598,7 +600,7 @@
 			if(!$this->mysqli->error){
 				$row=$r->fetch_assoc();
 				if($row){
-					$q="set @id='';call sp_crSession(@id,'admc','HOLA','127.0.0.1');select @id";
+					$q="set @id='';call sp_crSession(@id,'$id','HOLA','127.0.0.1');select @id";
 					foreach(explode(";",$q) as $q_){
 						$r=$this->mysqli->query($q_);
 					}

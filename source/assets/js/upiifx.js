@@ -2,9 +2,9 @@
 	String.prototype.replaceAt=function(index, _char) {
 		return this.substr(0, index) + _char + this.substr(index+_char.length);
 	}
-	var dz=angular.module('upii', ['ngAnimate', 'ui.bootstrap', 'ngCookies']);
+	var upii=angular.module('upii', ['ngAnimate', 'ui.bootstrap', 'ngCookies']);
 	var endpoint="http://ss.localhost:82/rest/api.php";
-	dz.directive('ngConfirmClick', [
+	upii.directive('ngConfirmClick', [
         function(){
             return {
                 link: function (scope, element, attr) {
@@ -18,7 +18,7 @@
                 }
             };
     }]);
-	dz.directive('capitalizeFirst', function(uppercaseFilter, $parse) {
+	upii.directive('capitalizeFirst', function(uppercaseFilter, $parse) {
 	   return {
 		 require: 'ngModel',
 		 link: function(scope, element, attrs, modelCtrl) {
@@ -37,7 +37,7 @@
 		 }
 	   };
 	});
-	dz.controller('BCTRL', ['$scope','$http','$cookies', function($scope,$http,$cookies){
+	upii.controller('BCTRL', ['$scope','$http','$cookies', function($scope,$http,$cookies){
 		var ctrl=this;
 		if($cookies.get("sssnid")){
 			$scope.sssn=new Object();
@@ -45,6 +45,9 @@
 			$scope.sssn.usr=$cookies.get("sssnusr");
 			$scope.sssn.flgs=$cookies.get("sssnflgs");
 			$scope.showSessionInfo=true;
+			if(!(parseInt($scope.sssn.flgs)&4)){
+				window.location.replace("index.html");
+			}
 		}
 		else{
 			$scope.showSessionInfo=false;
@@ -85,7 +88,7 @@
 			$scope.title=b.nom;
 		}
 	}]);
-	dz.controller('ACTRL', ['$scope','$http','$cookies', function($scope,$http,$cookies,ngDialog){
+	upii.controller('ACTRL', ['$scope','$http','$cookies', function($scope,$http,$cookies,ngDialog){
 		var ctrl=this;
 		if($cookies.get("sssnid")){
 			$scope.sssn=new Object();
@@ -93,6 +96,9 @@
 			$scope.sssn.usr=$cookies.get("sssnusr");
 			$scope.sssn.flgs=$cookies.get("sssnflgs");
 			$scope.showSessionInfo=true;
+			if(!(parseInt($scope.sssn.flgs)&8)){
+				window.location.replace("index.html");
+			}
 		}
 		else{
 			$scope.showSessionInfo=false;
@@ -260,7 +266,7 @@
 		}
 	}]);
 			 
-	dz.controller('STACTRL', ['$scope','$http','$cookies', function($scope,$http,$cookies){
+	upii.controller('STACTRL', ['$scope','$http','$cookies', function($scope,$http,$cookies){
 		$scope.title="";
 		if($cookies.get("sssnid")){
 			$scope.sssn=new Object();
@@ -268,6 +274,9 @@
 			$scope.sssn.usr=$cookies.get("sssnusr");
 			$scope.sssn.flgs=$cookies.get("sssnflgs");
 			$scope.showSessionInfo=true;
+			if(!(parseInt($scope.sssn.flgs)&2)){
+				window.location.replace("index.html");
+			}
 		}
 		else{
 			$scope.showSessionInfo=false;
@@ -286,7 +295,7 @@
 			
 		}
 	}]);
-	dz.controller('LINTMPCTRL', ['$scope','$http','$cookies', function($scope,$http,$cookies){
+	upii.controller('LINTMPCTRL', ['$scope','$http','$cookies', function($scope,$http,$cookies){
 		$scope.title="";
 		if($cookies.get("sssnid")){
 			$scope.sssn=new Object();
@@ -294,6 +303,9 @@
 			$scope.sssn.usr=$cookies.get("sssnusr");
 			$scope.sssn.flgs=$cookies.get("sssnflgs");
 			$scope.showSessionInfo=true;
+			if(!(parseInt($scope.sssn.flgs)&1)){
+				window.location.replace("index.html");
+			}
 		}
 		else{
 			$scope.showSessionInfo=false;
@@ -384,7 +396,7 @@
 				});
 		}
 	}]);
-	dz.controller('LCTRL', ['$scope','$http','$cookies', function($scope,$http,$cookies){
+	upii.controller('LCTRL', ['$scope','$http','$cookies', function($scope,$http,$cookies){
 		$scope.showLoginErrMsg=false;
 		$scope.showControlPanel=false;
 		$scope.mnu=new Object();
@@ -398,7 +410,7 @@
 			$scope.mnu.e="estadisticas.html";
 			$scope.mnu.b="becas.html";
 			$scope.mnu.l="lineatiempo.html";
-			if(parseInt($scope.sssn.flgs)>=5){
+			if(parseInt($scope.sssn.flgs)&16){
 				$scope.showControlPanel=true;
 			}
 		}
@@ -441,7 +453,7 @@
 				});;
 		}
 		$scope.checkFlags=function(){
-			if($scope.sssn && parseInt($scope.sssn.flgs)&&32){
+			if($scope.sssn && (parseInt($scope.sssn.flgs)&16)){
 				$scope.showControlPanel=true;
 				$http.get(endpoint+'?r=sas&n=r&sssn='+$scope.sssn.id)
 					.success(function(data, status, headers, config) {
