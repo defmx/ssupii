@@ -64,13 +64,29 @@
 								<h2>Filtrar</h2>
 								<ul class="small-image-list">
 									<li>
-										<a href="" ng-click="xy('b')"><h4>Por año</h4></a>
+										<a href="" ng-click="g1()"><h4>Por semestre</h4></a>
+										<ul class="small-image-list" style="padding-left:1em;line-height: 13px;">
+											<li ng-repeat="s in data1.data|limitTo:semToShow" style="line-height: 13px;">
+												<a href=""><h4 style="display:inline;font-size:.9em;" ng-click="xy('a',s.year,s.sem)">{{s.year}} - {{s.sem}} </h4></a>
+											</li>
+											<li id="svwxp"><a href="" style="text-decoration:none;"><h5 style="display:inline;font-size.9em;" ng-click="expandSemList()">(Ver más)</h5></a></li>
+										</ul>
 									</li>
                                     <li>
-                                        <h4>Por beca</h4>
+                                        <a href="" ng-click="g2()"><h4>Por beca</h4></a>
+										<ul class="small-image-list" style="padding-left:1em;line-height: 13px;">
+											<li ng-repeat="s in data2.data" style="line-height: 13px;">
+												<a href=""><h4 style="display:inline;font-size:.9em;" ng-click="xy('b',s.bid)">{{s.nom}}</h4></a>
+											</li>
+										</ul>
                                     </li>
                                     <li>
-                                        <h4>Por carrera</h4>
+                                        <a href="" ng-click="g3()"><h4>Por carrera</h4></a>
+										<ul class="small-image-list" style="padding-left:1em;line-height: 13px;">
+											<li ng-repeat="s in data3.data" style="line-height: 13px;">
+												<a href=""><h4 style="display:inline;font-size:.9em;" ng-click="xy('c',s.cid)">{{s.nom}}</h4></a>
+											</li>
+										</ul>
                                     </li>
 								</ul>
 							</section>

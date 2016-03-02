@@ -19,15 +19,15 @@
 			parent::__construct();			
 			$this->mysqli = new mysqli("p:".self::DB_SERVER,self::DB_USER,self::DB_PASSWORD,self::DB_NAME);
 			$this->Q[]="SELECT calum._id as id,calum.nom as nombre,calum.app as ap_p, calum.apm as ap_m,cbeca._id as bid,cbeca.nom as bnom,ccarr._id as cid,ccarr.nom as cnom,0 as showEdit FROM calum join cbeca on calum.bid=cbeca._id join ccarr on calum.cid=ccarr._id";
-			$this->Q[]="SELECT cbeca._id as bid,cbeca.nom,cbeca.amt,count(1)-isnull(calum.bid) as count FROM cbeca left join calum on cbeca._id=calum.bid group by cbeca._id";
-			$this->Q[]="SELECT _id as cid,nom,tim as tiempo FROM ccarr";
+			$this->Q[]="";
+			$this->Q[]="";
 			$this->Q[]="SELECT _key,val FROM cconf WHERE _key in ('MAX_YEAR','MIN_YEAR','SEM_PER_YEAR')";
 			$this->sQ[]="select calum.yr,calum.sem,count(1) FROM calum GROUP BY calum.yr,calum.sem";
 			//Sem-Carr
 			$this->staQ[]="select concat(convert(calum.yr,char),' - ',convert(calum.sem,char)) as k0 ,ccarr.nom as k1,count(1) as v0 from calum join ccarr on calum.cid=ccarr._id where calum.bid>0 group by calum.sem,calum.yr,ccarr.nom;";
 			//Sem-Beca
-			$this->staQ[]="SELECT distinct yr,sem FROM calum";
-			$this->staQ[]="SELECT count(1) as c FROM calum WHERE yr={y} and sem={s} and bid={b} GROUP BY yr,sem,bid";
+			$this->staQ[]="";
+			$this->staQ[]="";
 			//Sem-Carr-Beca
 			$this->staQ[]="select concat(convert(calum.yr,char),' - ',convert(calum.sem,char)) as k0 ,ccarr.nom as k1, cbeca.nom as k2,count(1) as v0 from calum join ccarr on calum.cid=ccarr._id join cbeca on calum.bid=cbeca._id where calum.bid>0 group by calum.sem,calum.yr,ccarr.nom,cbeca.nom";
 			//Alumno-Beca
@@ -50,8 +50,6 @@
 				$q=$q."  ORDER BY cbeca._id,calum.app,calum.apm";
 				return $q;
 			}
-			if($n==="b")
-				return $this->Q[1];
 			if($n==="c")
 				return $this->Q[2];
 		}
@@ -59,6 +57,12 @@
 		public function processApi(){
 			$func = strtolower(trim(str_replace("/","",$_REQUEST['r'])));
 			$sssn=null;
+			$data = json_decode(file_get_contents('php://input'), true);
+			if($data){
+				foreach(array_keys($data) as $i){
+					$data[$i]=str_replace("'",null,$data[$i]);
+				}
+			}
 			if(isset($_REQUEST['sssn']) && $_REQUEST['sssn']!=""){
 				$sssn=$_REQUEST['sssn'];
 				$q="SELECT duration,created FROM ksess WHERE _id='$sssn'";
@@ -85,6 +89,7 @@
 				if($func=="seek"){
 					if($this->get_request_method() != "GET"){
 						$this->response('',406);
+						return;
 					}
 					if(isset($_REQUEST['q']) && $_REQUEST['q']!=""){
 						$w=$_REQUEST['q'];
@@ -94,6 +99,7 @@
 				elseif($func=="stq"){
 					if($this->get_request_method() != "GET"){
 						$this->response('',406);
+						return;
 					}
 					if(isset($_REQUEST['n']) && $_REQUEST['n']!=""){
 						$w=$_REQUEST['n'];
@@ -103,54 +109,84 @@
 				elseif($func=="zzz"){
 					if($this->get_request_method() != "POST"){
 						$this->response('',406);
+						return;
 					}
-					$data = json_decode(file_get_contents('php://input'), true);
 					$this->$func($data);
 				}
 				elseif($func=="waw"){					
-					if($this->get_request_method() != "POST"){
+					if(!($this->get_request_method() == "POST" || $this->get_request_method() == "DELETE")){
 						$this->response('',406);
+						return;
 					}
-					$data = json_decode(file_get_contents('php://input'), true);
 					if(isset($_REQUEST['n']) && $_REQUEST['n']!=""){
 						$w=$_REQUEST['n'];
 					}
-					$this->$func($data,$w);
+					$this->$func($data,$w,$this->get_request_method());
+				}
+				elseif($func=="sas"){					
+					if($this->get_request_method() != "GET"){
+						$this->response('',406);
+						return;
+					}
+					if(isset($_REQUEST['n']) && $_REQUEST['n']!=""){
+						$f=null;
+						if(isset($_REQUEST['f']) && $_REQUEST['f']!=""){
+							$f=$_REQUEST['f'];
+						}
+						$n=$_REQUEST['n'];
+					}
+					$this->$func($n,$f);
+				}
+				elseif($func=="sta"){
+					if($this->get_request_method() != "GET"){
+						$this->response('',406);
+						return;
+					}
+					if(isset($_REQUEST['n']) && $_REQUEST['n']!=""){
+						$n=$_REQUEST['n'];
+						$f0=null;
+						$f1=null;
+						if(isset($_REQUEST['f0']) && $_REQUEST['f0']!=""){
+							$f0=$_REQUEST['f0'];
+						}
+						if(isset($_REQUEST['f1']) && $_REQUEST['f1']!=""){
+							$f1=$_REQUEST['f1'];
+						}
+						$this->$func($n,$f0,$f1);
+					}
 				}
 				else
 					$this->$func();
 			}
-			else
+			else{
 				$this->response('',404);
+				return;
+			}
 		}
 		
-		private function sas(){
-			if($this->get_request_method() != "GET"){
-				$this->response('',406);
+		private function sas($n,$f){
+			if($n=="a"){
+				$this->sas_a($n,$f);
+				return;
 			}
-			if(isset($_REQUEST['n']) && $_REQUEST['n']!=""){
-				$f=null;
-				if(isset($_REQUEST['f']) && $_REQUEST['f']!=""){
-					$f=$_REQUEST['f'];
+			elseif($n=="x"){
+				$this->sas_x();
+				return;
+			}
+			elseif($n=="r"){
+				$q="SELECT _id,nom,flags FROM krole WHERE _id>0";
+			}
+			elseif($n=="u"){
+				if(isset($_REQUEST['ri']) && $_REQUEST['ri']!=""){
+					$rid=$_REQUEST['ri'];
+					$q="SELECT _id,email,nom,app,apm FROM kusrs WHERE rid=$rid AND rid>0";
 				}
-				$n=$_REQUEST['n'];
-				if($n==="a"){
-					$this->sas_a($n,$f);
-					return;
-				}
-				elseif($n=="r"){
-					$q="SELECT _id,nom,flags FROM krole WHERE _id>0";
-				}
-				elseif($n=="u"){
-					if(isset($_REQUEST['ri']) && $_REQUEST['ri']!=""){
-						$rid=$_REQUEST['ri'];
-						$q="SELECT _id,email,nom,app,apm FROM kusrs WHERE rid=$rid AND rid>0";
-					}
-				}
-				else{
-					$q=$this->query($n);
-				}
-				if(!$q) return;
+			}			
+			elseif($n=="b"){
+				$q="SELECT cbeca._id as bid,cbeca.nom,cbeca.amt,count(1)-isnull(calum.bid) as count FROM cbeca left join calum on cbeca._id=calum.bid group by cbeca._id";
+			}
+			elseif($n=="c"){
+				$q="SELECT _id as cid,nom,tim as tiempo FROM ccarr";
 			}
 			else{
 				$this->response('',204);
@@ -182,7 +218,8 @@
 		
 		private function sas_a($n,$f){
 			$this->mysqli->query("SET NAMES 'utf8'");
-			$r=$this->mysqli->query($this->query("b"));
+			$q="SELECT cbeca._id as bid,cbeca.nom,cbeca.amt,count(1)-isnull(calum.bid) as count FROM cbeca left join calum on cbeca._id=calum.bid group by cbeca._id";
+			$r=$this->mysqli->query($q);
 			$b=array();
 			while ($row=$r->fetch_assoc())
 			{
@@ -192,14 +229,14 @@
 			foreach($b as $i){
 				$_REQUEST['bid']=$i['bid'];
 				$this->mysqli->query("SET NAMES 'utf8'");
-				$q="SELECT calum._id as id,calum.nom as nombre,calum.app as ap_p, calum.apm as ap_m,cbeca._id as bid,cbeca.nom as bnom,ccarr._id as cid,ccarr.nom as cnom,0 as showEdit FROM calum join cbeca on calum.bid=cbeca._id join ccarr on calum.cid=ccarr._id";
+				$q="SELECT calum._id AS id,calum.nom AS nombre,calum.app AS ap_p,calum.apm AS ap_m,cbeca._id AS bid,cbeca.nom AS bnom,ccarr._id AS cid,ccarr.nom AS cnom FROM calum JOIN cbeca ON calum.bid=cbeca._id JOIN ccarr ON calum.cid=ccarr._id JOIN rz00 ON calum._id=rz00.aid";
 				$q.=" WHERE 1=1 ";
 				if(isset($_REQUEST['bid']) && $_REQUEST['bid']!=""){
 					$q=$q." AND calum.bid=".$_REQUEST['bid'];
 				}
 				if(isset($_REQUEST['s']) && $_REQUEST['s']!="" && isset($_REQUEST['y']) && $_REQUEST['y']!=""){
-					$q=$q." AND calum.sem=".$_REQUEST['s'];
-					$q=$q." AND calum.yr=".$_REQUEST['y'];
+					$q=$q." AND rz00.sem=".$_REQUEST['s'];
+					$q=$q." AND rz00.yr=".$_REQUEST['y'];
 				}
 				if($f){
 					$q=$q." AND (calum._id LIKE '%$f%' OR calum.nom LIKE '%$f%' OR calum.app LIKE '%$f%' OR calum.apm LIKE '%$f%')";
@@ -226,6 +263,27 @@
 				var_dump($resp);
 				$this->response(json_last_error_msg(), 200);
 			}
+		}
+		
+		private function sas_x(){
+			$q="SELECT _key,val FROM cconf";
+			$r=$this->mysqli->query($q);
+			$resp=new stdClass();
+			while($row=$r->fetch_assoc()){
+				if($row['_key']=="THIS_YEAR"){
+					$resp->thisYr=$row['val'];
+				}
+				elseif($row['_key']=="THIS_SEM"){
+					$resp->thisSem=$row['val'];
+				}
+				elseif($row['_key']=="SEM_TO_SHOW"){
+					$resp->semsToShow=$row['val'];
+				}
+				elseif($row['_key']=="MIN_YEAR"){
+					$resp->startYr=$row['val'];
+				}
+			}
+			$this->response(json_encode($resp),200);
 		}
 		
 		private function sab(){
@@ -273,9 +331,13 @@
 			}
 		}
 		
-		private function waw($data,$w){
+		private function waw($data,$w,$action){
 			if($w&&$w=="r"){
-				$this->waw_r($data);
+				$this->waw_r($data,$action);
+				return;
+			}
+			elseif($w&&$w=="u"){
+				$this->waw_u($data,$action);
 				return;
 			}
 			if(isset($data['id']) && $data['id']!=""){
@@ -290,6 +352,7 @@
 			}
 			if($id0){
 				if($id0!==$id){
+					//For table 'rz00' the update is done by a fk cascade
 					$q="UPDATE calum SET _id='$id' WHERE _id='$id0'";
 					$this->mysqli->query($q);
 				}
@@ -305,9 +368,11 @@
 			else{
 				if($id!=="uuid()")
 					$id="'".$id."'";
-				$q="INSERT calum(_id,nom,app,apm,sem,yr,bid,cid) VALUES ($id,'".$data['nom']."','".$data['ap_p']."','".$data['ap_m']."',".$data['sem'].",".$data['yr'].",".$data['bid'].",".$data['cid'].")";
+				$q="INSERT calum(_id,nom,app,apm,sem,yr,bid,cid,semi,yri) VALUES ($id,'".$data['nom']."','".$data['ap_p']."','".$data['ap_m']."',".$data['sem'].",".$data['yr'].",".$data['bid'].",".$data['cid'].",".$data['sem'].",".$data['yr'].")";
 				$this->mysqli->query("SET NAMES 'utf8'");
 				$r=$this->mysqli->query($q);
+				/*$q="INSERT rz00 (aid,bid,sem,yr) SELECT $id,".$data['bid'].",".$data['semi'].",".$data['yri'];
+				$r=$this->mysqli->query($q);*/
 			}
 			if ($this->mysqli->error) {
 				$resp=array("q"=>$q,"err"=>$this->mysqli->error);
@@ -320,12 +385,42 @@
 			$this->mysqli->close();
 		}
 		
-		private function waw_r($data){
-			if(isset($data['_id'])&&$data['_id']){
-				$q="UPDATE krole SET nom='".$data['nom']."',flags=".$data['flags']." WHERE _id=".$data['_id'];				
+		private function waw_r($data,$action){
+			if($action=="POST"){
+				if(isset($data['_id'])&&$data['_id']){
+					$q="UPDATE krole SET nom='".$data['nom']."',flags=".$data['flags']." WHERE _id=".$data['_id'];				
+				}
+				else{
+					$q="INSERT krole(nom,flags) SELECT '".$data['nom']."',".$data['flags'];
+				}
+			}
+			elseif($action=="DELETE"){
+				if(isset($_REQUEST['ri'])&&$_REQUEST['ri']){
+					$q="DELETE FROM krole WHERE _id=".$_REQUEST['ri'];				
+				}
+			}
+			$this->mysqli->query($q);
+			if($this->mysqli->error){
+				$this->response(json_encode($this->mysqli->error),404);
 			}
 			else{
-				$q="INSERT krole(nom,flags) SELECT '".$data['nom']."',".$data['flags'];
+				$this->response("",200);
+			}
+		}
+		
+		private function waw_u($data,$action){
+			if($action=="POST"){
+				if(isset($data['_id'])&&$data['_id']){
+					$q="UPDATE krole SET nom='".$data['nom']."',flags=".$data['flags']." WHERE _id=".$data['_id'];				
+				}
+				else{
+					$q="INSERT krole(nom,flags) SELECT '".$data['nom']."',".$data['flags'];
+				}
+			}
+			elseif($action=="DELETE"){
+				if(isset($_REQUEST['ri'])&&$_REQUEST['ri']){
+					$q="DELETE FROM krole WHERE _id=".$_REQUEST['ri'];				
+				}
 			}
 			$this->mysqli->query($q);
 			if($this->mysqli->error){
@@ -378,63 +473,52 @@
 			$this->mysqli->close();
 		}
 		
-		private function sta(){
-			if($this->get_request_method() != "GET"){
-				$this->response('',406);
+		private function sta($n,$f0,$f1){
+			if($n=="a"){
+				$q="SELECT cbeca._id as bid,cbeca.nom,count(1)-isnull(rz00.bid) as count FROM cbeca left join rz00 on cbeca._id=rz00.bid where sem=$f1 and yr=$f0 group by cbeca._id";
 			}
-			if(isset($_REQUEST['n']) && $_REQUEST['n']!=""){
-				$n=$_REQUEST['n'];
-				if($n==="a"){
-					$i=0;
-				}
-				elseif($n==="b"){
-					$i=1;
-				}
-				elseif($n==="c"){
-					$i=3;
-				}
-				else{
-					$this->response('UNDEF', 200);
-					return;
-				}
+			elseif($n=="b"){
+				$q="select cbeca._id as bid,cbeca.nom,count(1) from rz00 join cbeca on rz00.bid=cbeca._id where sem=2 and yr=2014 group by bid";
+			}
+			elseif($n=="c"){
+				$i=3;
+			}
+			else{
+				$this->response('UNDEF', 200);
+				return;
 			}
 			$this->mysqli->query("SET NAMES 'utf8'");
-			$r=$this->mysqli->query($this->query("b"));
+			$r=$this->mysqli->query($q);
 			$h=array();
 			while($row=$r->fetch_assoc()){
 				$h[]=$row;
 			}
-			$result=array();			
-			$q=$this->staQ[1];
-			$this->mysqli->query("SET NAMES 'utf8'");
-			$r=$this->mysqli->query($q);
-			while($row=$r->fetch_assoc()){
-				$obj=new stdClass();
-				$obj->dataPoints=array();
-				$obj->type="spline";
-				$obj->showInLegend=true;
-				$obj->name=$row['yr']."-".$row['sem'];
-				$obj->legendText=$row['yr']."-".$row['sem'];
-				foreach($h as $g){
-					$obj1=new stdClass();
-					$obj1->label=$g['nom'];
-					$q_=$this->staQ[2];
-					$this->mysqli->query("SET NAMES 'utf8'");
-					$q_=str_replace("{y}",$row['yr'],$q_);
-					$q_=str_replace("{s}",$row['sem'],$q_);
-					$q_=str_replace("{b}",$g['bid'],$q_);
-					$r_=$this->mysqli->query($q_);
-					$row_=$r_->fetch_assoc();
-					if($row_['c']){
-						$obj1->y=intval($row_['c']);
-					}
-					else{
-						$obj1->y=0;
-					}					
-					$obj->dataPoints[]=$obj1;
+			$result=array();
+			$obj=new stdClass();
+			$obj->dataPoints=array();
+			$obj->type="spline";
+			$obj->showInLegend=true;
+			$obj->name=$f0."-".$f1;
+			$obj->legendText=$f0."-".$f1;
+			foreach($h as $g){
+				$obj1=new stdClass();
+				$obj1->label=$g['nom'];
+				$q_="SELECT count(1) as c FROM rz00 WHERE yr={y} and sem={s} and bid={b} GROUP BY yr,sem,bid";
+				$this->mysqli->query("SET NAMES 'utf8'");
+				$q_=str_replace("{y}",$f0,$q_);
+				$q_=str_replace("{s}",$f1,$q_);
+				$q_=str_replace("{b}",$g['bid'],$q_);
+				$r_=$this->mysqli->query($q_);
+				$row_=$r_->fetch_assoc();
+				if($row_['c']){
+					$obj1->y=intval($row_['c']);
 				}
-				$result[]=$obj;
-			}			
+				else{
+					$obj1->y=0;
+				}					
+				$obj->dataPoints[]=$obj1;
+			}
+			$result[]=$obj;
 			$resp=array("title"=>"","data"=>$result);
 			$this->response($this->json($resp),200);
 		}
@@ -609,7 +693,7 @@
 						$this->response("",404);
 					}
 					$sessid=$row['@id'];
-					$q="select ksess._id as sssnid,kusrs._id as user,ksess.duration,ksess.persist,ksess.created,krole.flags FROM ksess JOIN kusrs ON ksess.uid=kusrs._id JOIN krole ON krole._id=kusrs.rid WHERE ksess._id='{sessid}'";
+					$q="select ksess._id as sssnid,kusrs._id as user,ksess.duration,ksess.persist,ksess.created,krole.flags,krole.nom as rnom FROM ksess JOIN kusrs ON ksess.uid=kusrs._id JOIN krole ON krole._id=kusrs.rid WHERE ksess._id='{sessid}'";
 					$q=str_replace("{sessid}",$sessid,$q);
 					$r=$this->mysqli->query($q);
 					$row=$r->fetch_assoc();

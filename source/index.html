@@ -6,7 +6,7 @@
 -->
 <html ng-app="upii">
 	<head>
-		<title>Inicio</title>
+		<title>Portal de administración de becas Upiita</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
 		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
@@ -46,10 +46,10 @@
 							<header id="header2">
 								<nav id="nav">
 									<a href="index.html" class="current-page-item">Inicio</a>
-									<a href="{{mnu.a}}">Alumnos</a>
-									<a href="{{mnu.e}}">Estadísticas</a>
-									<a href="{{mnu.b}}">Becas</a>
-									<a href="{{mnu.l}}">Línea del tiempo</a>
+									<a href="{{mnu.a}}" ng-show="and(8,sssn.flgs)">Alumnos</a>
+									<a href="{{mnu.b}}" ng-show="and(4,sssn.flgs)">Becas</a>
+									<a href="{{mnu.e}}" ng-show="and(2,sssn.flgs)">Estadísticas</a>
+									<a href="{{mnu.l}}" ng-show="and(1,sssn.flgs)">Línea del tiempo</a>
 								</nav>
 							</header>
 							<pre style="padding:0px 0px 10px 10px" ng-show="showSessionInfo">Sesión iniciada: ({{sssn.usr}})      <a href="" ng-click="endSession()">~</a></pre>
@@ -83,9 +83,15 @@
 
 							<section>
 								<h2>Administración</h2>
-								<p>Administre el acceso a la aplicación mediante roles y usuarios.</p>
+								<pre>Administre el acceso mediante roles y usuarios.</pre><br/>
 								<footer class="controls">
-									<a href="" ng-click="showRoles!=showRoles" class="button">Administrar ahora</a>
+									<!--<a href="" ng-click="showRoles!=showRoles" class="button">Administrar ahora</a>-->
+									<h3>Información</h3>
+									<table>
+									<tr><td><pre>Semestre actual:   </td><td><strong>{{xdata.thisYr+' - '+xdata.thisSem}}</strong></td><td>   [<a href="" data-toggle="tooltip" title="Finalizar el semestre actual">#</a>]</pre></td></tr>
+									<tr><td><pre>Semestres a mostrar:   </td><td><strong>{{xdata.semsToShow}}</strong></td><td>    [<a href="" data-toggle="tooltip" title="Editar">#</a>]</pre></td></tr>
+									<tr><td><pre>Año inicial:   </td><td><strong>{{xdata.startYr}}</strong></td><td>   [<a href="" data-toggle="tooltip" title="Editar">#</a>]</pre></td></tr>
+									</table>
 								</footer>
 							</section>
 
@@ -100,17 +106,19 @@
 										<form>
 											<ul class="inline">
 												<li><a href="" ng-click="listUsers(s._id)"><span>{{s.nom}}</span></a></li>
-												 ( <li><a href="" ng-click="showEditRoleForm"><img src="images/edit.png" style="height:15px;width:15px;" data-toggle="tooltip" title="Editar"/></a></li>
+												 ( <li><a href="" ng-click="showEditRoleForm"><img src="images/edit.png" style="height:16px;width:16px;" data-toggle="tooltip" title="Editar"/></a></li>
 												<li><a href="" ng-click="saveRole(s)"><img id="{{'rsave'+s._id}}" src="images/save.png" style="height:18px;width:18px;" data-toggle="tooltip" title="Guardar"/></a></li>
 												<li><img src="images/loading_spinner.gif" id="{{'rwait'+s._id}}" style="height:18px;width:18px;display:none;" data-toggle="tooltip" title="Guardar"/></li>
+												<li><a href="" ng-click="deleteRole(s)"><img id="{{'rdel'+s._id}}" src="images/delete.png" style="height:16px;width:16px;" data-toggle="tooltip" title="Eliminar"/></a></li>
+												<li><img src="images/loading_spinner.gif" id="{{'rwait2'+s._id}}" style="height:18px;width:18px;display:none;" data-toggle="tooltip" title="Guardar"/></li>
 												  )
 											</ul>
 											<br><br>
 											<div class="inline">
-											<input type="checkbox" ng-checked="logicalAnd(8,s.flags)" ng-model="s.a" ng-true-value="8" ng-false-value="0" data-toggle="tooltip" title="Alumnos">A</input>
-											<input type="checkbox" ng-checked="logicalAnd(4,s.flags)" ng-model="s.b" ng-true-value="4" ng-false-value="0"  data-toggle="tooltip" title="Becas">B</input>
-											<input type="checkbox" ng-checked="logicalAnd(2,s.flags)" ng-model="s.e" ng-true-value="2" ng-false-value="0" data-toggle="tooltip" title="Estadísticas">E</input>
-											<input type="checkbox" ng-checked="logicalAnd(1,s.flags)" ng-model="s.lt" ng-true-value="1" ng-false-value="0" data-toggle="tooltip" title="Línea del tiempo">LT</input>
+											<input type="checkbox" ng-checked="and(8,s.flags)" ng-model="s.a" ng-true-value="8" ng-false-value="0" data-toggle="tooltip" title="Alumnos">A</input>
+											<input type="checkbox" ng-checked="and(4,s.flags)" ng-model="s.b" ng-true-value="4" ng-false-value="0"  data-toggle="tooltip" title="Becas">B</input>
+											<input type="checkbox" ng-checked="and(2,s.flags)" ng-model="s.e" ng-true-value="2" ng-false-value="0" data-toggle="tooltip" title="Estadísticas">E</input>
+											<input type="checkbox" ng-checked="and(1,s.flags)" ng-model="s.lt" ng-true-value="1" ng-false-value="0" data-toggle="tooltip" title="Línea del tiempo">LT</input>
 											</div>
 											<!--<span> fl={{s.a+s.b+s.e+s.lt}}</span>-->
 										</form>
@@ -118,7 +126,7 @@
 								</ul><hr/>
 								<ul>
 									<li><a href="" ng-click="showAddRoleForm=!showAddRoleForm" style="padding-left:1em;">Agregar</a></li>
-									<li ng-show="showAddRoleForm">
+									<li ng-show="showAddRoleForm" class="form">
 										Rol nuevo (  <a href="" ng-click="saveRole(s)"><img id="{{'rsave'+s._id}}" src="images/save.png" style="height:18px;width:18px;" data-toggle="tooltip" title="Guardar"/></a>  )
 										<input type="text" ng-model="s.nom" size="10" placeholder="nombre"/>
 									</li>
@@ -137,8 +145,14 @@
 													<table id="usersTable"><tr><td><a href="">{{u._id}}</a></td><td>{{u.nom}}</td><td>{{u.app}}</td><td>{{u.apm}}</td><td>{{u.email}}</td><td><a href="" data-toggle="tooltip" title="Reestablecer contraseña">z</a></td></tr></table>
 												</li><hr/>
 												<li><a href="" ng-click="showAddUserForm=!showAddUserForm" style="padding-left:1em;">Agregar</a></li>
-												<li ng-show="showAddUserForm">
-													Usuario nuevo (  <a href="" ng-click="saveRole(s)"><img id="{{'rsave'+s._id}}" src="images/save.png" style="height:18px;width:18px;" data-toggle="tooltip" title="Guardar"/></a>  )
+												<li ng-show="showAddUserForm" class="form">
+													Usuario nuevo (  <a href="" ng-click="saveUser(s)"><img id="{{'usave'+s._id}}" src="images/save.png" style="height:18px;width:18px;" data-toggle="tooltip" title="Guardar"/></a>  )
+													<input type="text" ng-model="s._id" size="10" placeholder="id"/>
+													<input type="text" ng-model="s.nom" size="10" placeholder="Nombre"/>
+													<input type="text" ng-model="s.app" size="10" placeholder="Ap Paterno"/>
+													<input type="text" ng-model="s.apm" size="10" placeholder="Ap Materno"/>
+													<input type="text" ng-model="s.email" size="10" placeholder="E-mail"/>
+													<input type="hidden" ng-model="s.rid" value="{{szr}}"/>
 												</li>
 											</ul>
 										</div>
