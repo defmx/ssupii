@@ -4,7 +4,7 @@
 	html5up.net | @n33co
 	Free for personal and commercial use under the CCA 3.0 license (html5up.net/license)
 -->
-<html ng-app="upii">
+<html ng-app="upii"> 
 	<head>
 		<title>Portal de administración de becas Upiita</title>
 		<meta charset="utf-8" />
@@ -70,13 +70,13 @@
 						</form>
 						</span>
 						<span style="bottom:30px;font-size:1em;color:red;" id="loginErrMsg" ng-show="showLoginErrMsg">Usuario/contraseña inválidos</span>
-						
+
 					</div>
 
 				</div>
 			</div>
-            
-			<div id="main" ng-show="showControlPanel">
+
+			<div id="main" ng-if="showControlPanel">
 				<div class="container">
 					<div class="row main-row">
 						<div class="4u 12u(mobile)">

@@ -74,10 +74,13 @@
 					$expires=strtotime(date("Y-m-d h:i:s",$created)." +1000 seconds");
 					$now=strtotime(date("Y-m-d h:i:s"));
 					if($now>$expires){
-						$sssn=null;
+						//$sssn=null;
 					}
 				}
 				elseif($func!=="zzz"){
+					$sssn=null;
+				}
+				else{
 					$sssn=null;
 				}
 			}

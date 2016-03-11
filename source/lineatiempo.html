@@ -61,15 +61,20 @@
 						<div class="4u 12u(mobile)">
 							<h2>Alumnos</h2>
 							<section>
+								<pre>Buscar: </pre><br/>
+								<div>
+									<a href="" ng-click="o1k()"><span>Carrera: </span></a><br/>
+									<select id="input1" ng-model="mnuCarr" ng-options="a.nom for a in data0.data" ng-disabled="!b1" ng-change="o1ch()"/>
+									<div class="wait-div"><img id="wait1" style="width:35px;height:35px;" src="images/loading_spinner.gif"/></div>
+								</div>
+								<div class="option">
+									<input type="hidden"/><br/><br/>
+									<a href="" ng-click="o2k()"><span>Alumno: </span></a><br/>
+									<input id="input2" type="text" ng-model="q" ng-disabled="!b2" placeholder="(Boleta, nombre o apellidos)" size="30"/>
+									<input type="submit" ng-click="search(q)" value="OK" />
+									<div class="wait-div"><img id="wait1" style="width:35px;height:35px;" src="images/loading_spinner.gif"/></div>
+								</div>
 								<ul class="small-image-list">
-									<li>
-                                        <form>
-											<pre>Buscar: </pre>
-                                            <input type="text" ng-model="q" placeholder="(Boleta, nombre o apellidos)" size="30"/>
-                                            <input type="submit" ng-click="search(q)" value="OK" />
-											<div class="wait-div"><img id="wait1" style="width:35px;height:35px;" src="images/loading_spinner.gif"/></div>
-                                        </form>
-                                    </li>
 									<li><pre>{{data1.data.length}} Resultados</pre></li>
 									<li>
 										<table class="small-image-list">

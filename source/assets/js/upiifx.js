@@ -354,6 +354,8 @@
 	}]);
 	upii.controller('LINTMPCTRL', ['$scope','$http','$cookies', function($scope,$http,$cookies){
 		$scope.title="";
+		$scope.b2=false;
+		$scope.b1=false;
 		if($cookies.get("sssnid")){
 			$scope.sssn=new Object();
 			$scope.sssn.id=$cookies.get("sssnid");
@@ -440,7 +442,15 @@
 					}
 			});
 		}
-		
+		$http.get(endpoint+'?r=sas&n=c'+'&sssn='+$scope.sssn.id)
+				.success(function(data, status, headers, config) {
+					$scope.data0=data;
+				})
+			.error(function(data, status, headers, config) {
+				if(status==401){
+					window.location.replace("index.html");
+				}
+			});
 		$scope.search=function(q){
 			$('#wait1').show();
 			if(!q)q='%';
@@ -451,6 +461,23 @@
 						$('#wait1').hide();
 					}
 				});
+		}
+		$scope.o1k=function(){
+			$scope.b1=!$scope.b1;
+			$scope.b2=false;
+		}
+		$scope.o1ch=function(){
+			$http.get(endpoint+'?r=sas&n=c&q='+q+'&sssn='+$scope.sssn.id)
+				.success(function(data, status, headers, config) {
+					if(status==200){
+						$scope.data2=data;
+						$('#wait1').hide();
+					}
+				});
+		}
+		$scope.o2k=function(){
+			$scope.b2=!$scope.b2;
+			$scope.b1=false;
 		}
 	}]);
 	upii.controller('LCTRL', ['$scope','$http','$cookies', function($scope,$http,$cookies){
@@ -489,10 +516,10 @@
 					if(status==200){
 						var expd=new Date(data.created);
 						expd.setSeconds(expd.getSeconds()+parseInt(data.duration));
-						$cookies.put("sssnid",data.sssnid,{expires:expd});
-						$cookies.put("sssnusr",data.user,{expires:expd});
-						$cookies.put("sssnflgs",data.flags,{expires:expd});
-						$cookies.put("sssnrnom",data.rnom,{expires:expd});
+						$cookies.put("sssnid",data.sssnid);
+						$cookies.put("sssnusr",data.user);
+						$cookies.put("sssnflgs",data.flags);
+						$cookies.put("sssnrnom",data.rnom);
 						$scope.sssn=new Object();
 						$scope.sssn.id=$cookies.get("sssnid");
 						$scope.sssn.usr=$cookies.get("sssnusr");

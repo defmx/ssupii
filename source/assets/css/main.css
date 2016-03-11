@@ -2022,6 +2022,10 @@
 	input[type=file] {
 		display:none;
 	}
+	
+	select[disabled] {
+		background-color:rgba(181, 181, 181, 0.16);
+	}
 
 	input[type=submit] {
 		padding:.3em .5em; 
@@ -2067,6 +2071,12 @@
 	}
 	
 	.form{
+		box-shadow: .5px 1px 1px 1px #000000;
+		margin-top: 5px;
+		padding: .1em .5em .5em .5em;
+	}
+	
+	li.option{
 		box-shadow: .5px 1px 1px 1px #000000;
 		margin-top: 5px;
 		padding: .1em .5em .5em .5em;
