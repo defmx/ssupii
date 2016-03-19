@@ -1,5 +1,6 @@
 <?php
 	require_once("Rest.inc.php");
+	require_once("DbFx.php");
 	
 	class API extends REST {
 	
@@ -116,8 +117,9 @@
 					}
 					$this->$func($data);
 				}
-				elseif($func=="waw"){					
-					if(!($this->get_request_method() == "POST" || $this->get_request_method() == "DELETE")){
+				elseif($func=="waw"){
+					$methods=array("DELETE","PATCH","PUT");
+					if(!in_array($this->get_request_method(),$methods)){
 						$this->response('',406);
 						return;
 					}
@@ -136,9 +138,13 @@
 						if(isset($_REQUEST['f']) && $_REQUEST['f']!=""){
 							$f=$_REQUEST['f'];
 						}
+						$o=null;
+						if(isset($_REQUEST['o']) && $_REQUEST['o']!=""){
+							$o=$_REQUEST['o'];
+						}
 						$n=$_REQUEST['n'];
 					}
-					$this->$func($n,$f);
+					$this->$func($n,$f,$o);
 				}
 				elseif($func=="sta"){
 					if($this->get_request_method() != "GET"){
@@ -167,9 +173,9 @@
 			}
 		}
 		
-		private function sas($n,$f){
+		private function sas($n,$f,$o){
 			if($n=="a"){
-				$this->sas_a($n,$f);
+				$this->sas_a($n,$f,$o);
 				return;
 			}
 			elseif($n=="x"){
@@ -219,7 +225,7 @@
 			}
 		}
 		
-		private function sas_a($n,$f){
+		private function sas_a($n,$f,$o){
 			$this->mysqli->query("SET NAMES 'utf8'");
 			$q="SELECT cbeca._id as bid,cbeca.nom,cbeca.amt,count(1)-isnull(calum.bid) as count FROM cbeca left join calum on cbeca._id=calum.bid group by cbeca._id";
 			$r=$this->mysqli->query($q);
@@ -232,14 +238,20 @@
 			foreach($b as $i){
 				$_REQUEST['bid']=$i['bid'];
 				$this->mysqli->query("SET NAMES 'utf8'");
-				$q="SELECT calum._id AS id,calum.nom AS nombre,calum.app AS ap_p,calum.apm AS ap_m,cbeca._id AS bid,cbeca.nom AS bnom,ccarr._id AS cid,ccarr.nom AS cnom FROM calum JOIN cbeca ON calum.bid=cbeca._id JOIN ccarr ON calum.cid=ccarr._id JOIN rz00 ON calum._id=rz00.aid";
+				$q="SELECT DISTINCT calum._id,calum.nom,calum.app,calum.apm,calum.`out` AS `out`,(SELECT count(1) FROM rz00 WHERE aid=calum._id) as scount,cbeca._id AS bid,cbeca.nom AS bnom,ccarr._id AS cid,ccarr.nom AS cnom FROM calum JOIN cbeca ON calum.bid=cbeca._id JOIN ccarr ON calum.cid=ccarr._id JOIN rz00 ON calum._id=rz00.aid";
 				$q.=" WHERE 1=1 ";
 				if(isset($_REQUEST['bid']) && $_REQUEST['bid']!=""){
 					$q=$q." AND calum.bid=".$_REQUEST['bid'];
 				}
 				if(isset($_REQUEST['s']) && $_REQUEST['s']!="" && isset($_REQUEST['y']) && $_REQUEST['y']!=""){
-					$q=$q." AND rz00.sem=".$_REQUEST['s'];
-					$q=$q." AND rz00.yr=".$_REQUEST['y'];
+					if($o=="i"){
+						$q=$q." AND calum.semi=".$_REQUEST['s'];
+						$q=$q." AND calum.yri=".$_REQUEST['y'];
+					}
+					else{
+						$q=$q." AND rz00.sem=".$_REQUEST['s'];
+						$q=$q." AND rz00.yr=".$_REQUEST['y'];
+					}
 				}
 				if($f){
 					$q=$q." AND (calum._id LIKE '%$f%' OR calum.nom LIKE '%$f%' OR calum.app LIKE '%$f%' OR calum.apm LIKE '%$f%')";
@@ -350,16 +362,40 @@
 				$id="uuid()";
 			}
 			$id0=null;
-			if(isset($data['id0']) && $data['id0']!=""){
-				$id0=$data['id0'];
-			}
-			if($id0){
-				if($id0!==$id){
+			if(isset($data['id0']) && $data['id0']!=""){$id0=$data['id0'];}
+			$nom=null;
+			if(isset($data['nom']) && $data['nom']!=""){$nom=$data['nom'];}
+			$app=null;
+			if(isset($data['app']) && $data['app']!=""){$app=$data['app'];}
+			$apm=null;
+			if(isset($data['apm']) && $data['apm']!=""){$apm=$data['apm'];}
+			$bid=null;
+			if(isset($data['bid']) && $data['bid']!=""){$bid=$data['bid'];}
+			$cid=null;
+			if(isset($data['cid']) && $data['cid']!=""){$cid=$data['cid'];}
+			$out=null;
+			if(isset($data['out']) && $data['out']!=""){$out=$data['out'];}
+			$yr=null;
+			if(isset($data['yr']) && $data['yr']!=""){$yr=$data['yr'];}
+			$sem=null;
+			if(isset($data['sem']) && $data['sem']!=""){$sem=$data['sem'];}
+			if($action=="PATCH") {
+				if($id0&&$id0!==$id){
 					//For table 'rz00' the update is done by a fk cascade
 					$q="UPDATE calum SET _id='$id' WHERE _id='$id0'";
 					$this->mysqli->query($q);
 				}
-				$q="UPDATE calum SET nom='".$data['nombre']."',app='".$data['ap_p']."',apm='".$data['ap_m']."',bid=".$data['bid'].",cid=".$data['cid'].",sem=".$data['sem'].",yr=".$data['yr']." WHERE _id='$id'";
+				$q="UPDATE calum SET ";
+				if($nom) $q=$q."nom='".$nom."',";
+				if($app) $q=$q."app='".$app."',";
+				if($apm) $q=$q."apm='".$apm."',";
+				if($bid) $q=$q."bid=".$bid.",";
+				if($cid) $q=$q."cid=".$cid.",";
+				if($sem) $q=$q."sem=".$sem.",";
+				if($yr)  $q=$q."yr=".$yr.",";
+				if($out) $q=$q."`out`=".$out.",";
+				$q=substr($q,0,strlen($q)-1);
+				$q=$q." WHERE _id='$id'";
 				$r=$this->mysqli->query($q);
 				if($this->mysqli->error){
 					$this->response(json_encode($this->mysqli->error),400);
@@ -368,7 +404,7 @@
 					$this->response("",200);
 				}
 			}
-			else{
+			elseif($action=="PUT"){
 				if($id!=="uuid()")
 					$id="'".$id."'";
 				$q="INSERT calum(_id,nom,app,apm,sem,yr,bid,cid,semi,yri) VALUES ($id,'".$data['nom']."','".$data['ap_p']."','".$data['ap_m']."',".$data['sem'].",".$data['yr'].",".$data['bid'].",".$data['cid'].",".$data['sem'].",".$data['yr'].")";
@@ -389,16 +425,16 @@
 		}
 		
 		private function waw_r($data,$action){
-			if($action=="POST"){
+			if($action=="PATCH"){
 				if(isset($data['_id'])&&$data['_id']){
 					$q="UPDATE krole SET nom='".$data['nom']."',flags=".$data['flags']." WHERE _id=".$data['_id'];				
 				}
-				else{
-					$q="INSERT krole(nom,flags) SELECT '".$data['nom']."',".$data['flags'];
-				}
+			}
+			elseif($action=="PUT"){
+				$q="INSERT krole(nom,flags) SELECT '".$data['nom']."',".$data['flags'];
 			}
 			elseif($action=="DELETE"){
-				if(isset($_REQUEST['ri'])&&$_REQUEST['ri']){
+				if(isset($_REQUEST['i'])&&$_REQUEST['i']){
 					$q="DELETE FROM krole WHERE _id=".$_REQUEST['ri'];				
 				}
 			}
@@ -412,17 +448,18 @@
 		}
 		
 		private function waw_u($data,$action){
-			if($action=="POST"){
+			if($action=="PATCH"){
 				if(isset($data['_id'])&&$data['_id']){
-					$q="UPDATE krole SET nom='".$data['nom']."',flags=".$data['flags']." WHERE _id=".$data['_id'];				
-				}
-				else{
-					$q="INSERT krole(nom,flags) SELECT '".$data['nom']."',".$data['flags'];
+					$q="UPDATE kusrs SET nom='".$data['nom']."',flags=".$data['flags']." WHERE _id=".$data['_id'];				
 				}
 			}
+			elseif($action=="PUT"){
+				$defZ="cGFzc3dvcmQ=";
+				$q="INSERT kusrs(_id,email,nom,app,apm,rid,gzzms) SELECT '".$data['_id']."','".$data['email']."','".$data['nom']."','".$data['app']."','".$data['apm']."',".$data['rid'].",'".$defZ."'";
+			}
 			elseif($action=="DELETE"){
-				if(isset($_REQUEST['ri'])&&$_REQUEST['ri']){
-					$q="DELETE FROM krole WHERE _id=".$_REQUEST['ri'];				
+				if(isset($_REQUEST['i'])&&$_REQUEST['i']){
+					$q="DELETE FROM kusrs WHERE _id=".$_REQUEST['ri'];				
 				}
 			}
 			$this->mysqli->query($q);
@@ -711,6 +748,8 @@
 		private function json($data){
 			return json_encode($data);
 		}
+		
+		
 	}
 		
 	$api = new API;

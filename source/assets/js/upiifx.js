@@ -91,6 +91,7 @@
 	upii.controller('ACTRL', ['$scope','$http','$cookies', function($scope,$http,$cookies,ngDialog){
 		var ctrl=this;
 		$scope.semToShow=4;
+		$scope.sel1={"selectedValue":0};
 		if($cookies.get("sssnid")){
 			$scope.sssn=new Object();
 			$scope.sssn.id=$cookies.get("sssnid");
@@ -108,15 +109,25 @@
 		$scope.master = {};
 		$('.wait3').hide();
 		$('.ok-gif').hide();
-		$scope.currSemYr="Seleccionar";
+		$scope.currSemYr=null;
 		$scope.canAdd=false;
 		$scope.reset = function() {
 			$scope.a = angular.copy($scope.master);
 		};
+		$scope.sel1_changed=function(){
+			switch($scope.sel1.selectedValue){
+				case 0:
+					
+				break;
+				case 1:
+				break;
+			}
+			$scope.seek($scope.currYr,$scope.currSem,'%');
+		}
 		$scope.dynamicPopover = {
-			content: 'Hello, World!',
-			templateUrl: 'myPopoverTemplate.html',
-			title: 'Title'
+			content: '',
+			templateUrl: 'popoverTemplate.html',
+			title: ''
 		};
 		$scope.placement = {
 			options: [
@@ -191,7 +202,7 @@
 						window.location.replace("index.html");
 					}
 				});
-			$http.get(endpoint+'?r=sas&n=a&s='+s+'&y='+y+'&sssn='+$scope.sssn.id+'&f='+(f||'%'))
+			$http.get(endpoint+'?r=sas&n=a&s='+s+'&y='+y+'&sssn='+$scope.sssn.id+'&f='+(f||'%')+($scope.sel1.selectedValue==1?'&o=i':''))
 				.success(function(data, status, headers, config) {
 					$scope.data31=data;
 					$('#wait1').hide();
@@ -202,14 +213,39 @@
 					}
 				});
 		}
-		$scope.updateA=function(a){
+		$scope.put=function(a){
 			var data=$scope.a;
 			data.bid=$scope.mnuBecas?$scope.mnuBecas.bid:data.bid;
 			data.cid=$scope.mnuCarr?$scope.mnuCarr.cid:data.cid;
 			data.sem=$scope.currSem;
 			data.yr=$scope.currYr;
 			$('.wait3').show();
-			$http.post(endpoint+'?r=waw&n=a'+'&sssn='+$scope.sssn.id,data)
+			$http.put(endpoint+'?r=waw&n=a'+'&sssn='+$scope.sssn.id,data)
+				.success(function(data, status, headers, config) {
+					if(status==200){
+						$('.wait3').hide();
+						$('.ok-gif').show();
+						$scope.reset();
+						$scope.seek($scope.currYr,$scope.currSem);
+						setTimeout(function() {
+							$('.ok-gif').hide();
+						}, 3000);
+					}
+				})
+				.error(function(data, status, headers, config) {
+					if(status==401){
+						window.location.replace("index.html");
+					}
+				});
+		}
+		$scope.upd=function(a){
+			var data=$scope.a;
+			data.bid=$scope.mnuBecas?$scope.mnuBecas.bid:data.bid;
+			data.cid=$scope.mnuCarr?$scope.mnuCarr.cid:data.cid;
+			data.sem=$scope.currSem;
+			data.yr=$scope.currYr;
+			$('.wait3').show();
+			$http.patch(endpoint+'?r=waw&n=a'+'&sssn='+$scope.sssn.id,data)
 				.success(function(data, status, headers, config) {
 					if(status==200){
 						$('.wait3').hide();
@@ -232,6 +268,15 @@
 				.success(function(data, status, headers, config) {
 					if(status==200){
 						$scope.seek($scope.currYr,$scope.currSem);
+					}
+				});
+		}
+		$scope.markOut=function(a,b){
+			var c={"id":a._id,"out":b};
+			$http.patch(endpoint+'?r=waw&n=a'+'&sssn='+$scope.sssn.id,c)
+				.success(function(data, status, headers, config) {
+					if(status==200){
+						a.out=b;
 					}
 				});
 		}
@@ -480,7 +525,7 @@
 			$scope.b1=false;
 		}
 	}]);
-	upii.controller('LCTRL', ['$scope','$http','$cookies', function($scope,$http,$cookies){
+	upii.controller('LCTRL', ['$scope','$http','$cookies','$templateCache', function($scope,$http,$cookies,$templateCache){
 		$scope.showLoginErrMsg=false;
 		$scope.showControlPanel=false;
 		$scope.mnu=new Object();
@@ -580,29 +625,6 @@
 				.error(function(data, status, headers, config) {
 				});
 		}
-		$scope.saveRole=function(s){
-			$('#rsave'+s._id).hide();
-			$('#rwait'+s._id).show();
-			if(s.flags){
-				s.flags=s.a+s.b+s.e+s.lt;
-			}
-			else{
-				s.flags=0;
-			}
-			$http.post(endpoint+'?r=waw&n=r&sssn='+$scope.sssn.id,s)
-				.success(function(data, status, headers, config) {
-					if(status==200){
-						$('#rsave'+s._id).show();
-						$('#rwait'+s._id).hide();	
-						$scope.checkFlags();
-					}
-				})
-				.error(function(data, status, headers, config) {
-					if(status==401){
-						
-					}
-				});
-		};
 		$scope.deleteRole=function(s){
 			$('#rdel'+s._id).hide();
 			$('#rwait2'+s._id).show();
@@ -629,7 +651,7 @@
 			else{
 				return;
 			}
-			$http.post(endpoint+'?r=waw&n=u&sssn='+$scope.sssn.id,s)
+			$http.patch(endpoint+'?r=waw&n=u&sssn='+$scope.sssn.id,s)
 				.success(function(data, status, headers, config) {
 					if(status==200){
 						$('#usave'+s._id).show();
@@ -643,6 +665,53 @@
 					}
 				});
 		};
+		$scope.fetch = function() {
+			$scope.code = null;
+			$scope.response = null;
+			$http({method: $scope.method, url: $scope.url, cache: $templateCache, data: $scope.data}).
+				then(function(response) {
+					console.info(response.status,response.data);
+					if(response.status==200){
+						$('#'+$scope.type+'save'+$scope.data._id).show();
+						$('#'+$scope.type+'wait'+$scope.data._id).hide();	
+						$scope.checkFlags();
+					}
+				}
+				,function(response) {
+					console.error(response.status,response.data || "Request failed");
+				});
+		};
+		$scope.waw = function(method,type,s) {
+			$('#'+type+'save'+s._id).hide();
+			$('#'+type+'wait'+s._id).show();
+			if(type=='r'){
+				if(s.flags){
+					s.flags=s.a+s.b+s.e+s.lt;
+				}
+				else{
+					s.flags=0;
+				}
+			}
+			else if(type=='u'){
+				if($scope.szr&&s._id){
+					s.rid=$scope.szr;
+					s.z='';
+					s.email=s.email||'';
+					s.nom=s.nom||'';
+					s.app=s.app||'';
+					s.apm=s.apm||'';
+				}
+				else{
+					return;
+				}
+			}
+			$scope.method = method;
+			$scope.type=type;
+			$scope.url = endpoint+'?r=waw&n='+type+'&sssn='+$scope.sssn.id;
+			$scope.data=s;
+			$scope.fetch();
+		};
+		
 		$scope.and=function(a,b){
 			return a&b;
 		}

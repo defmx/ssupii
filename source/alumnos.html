@@ -4,8 +4,8 @@
 		<title>Portal de administración de becas Upiita</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
 		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
+		<link href="assets/css/bootstrap.min.css" rel="stylesheet">
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
         <link href="images/favicon.ico" rel="shortcut icon" type="image/vnd.microsoft.icon">
@@ -22,14 +22,14 @@
 		<script src="assets/js/upiifx.js"></script>
 		<script src="assets/js/angular-animate.js"></script>
 		<script src="assets/js/ui-bootstrap-tpls-1.1.2.js"></script>
-		<script type="text/ng-template" id="myPopoverTemplate.html">
+		<script type="text/ng-template" id="popoverTemplate.html">
 			<div class="form-group">
 				<input type="hidden" ng-model="a.id0" class="form-control">
-				<pre>Boleta:<input type="text" ng-model="a.id" class="form-control"></pre>
-				<pre>Nombre:<input type="text" ng-model="a.nombre" class="form-control"></pre>
-				<pre>Apellido Paterno:<input type="text" ng-model="a.ap_p" class="form-control"></pre>
-				<pre>Apellido Materno:<input type="text" ng-model="a.ap_m" class="form-control"></pre>
-				<a href="" ng-click="updateA(a)"><img id="{{'rsave'+a._id}}" src="images/save.png" style="float:right;margin:5px 5px 5px 5px;height:22px;width:22px;" data-toggle="tooltip" title="Guardar"/></a>
+				<pre>Boleta:<input type="text" ng-model="a._id" class="form-control"></pre>
+				<pre>Nombre:<input type="text" ng-model="a.nom" class="form-control"></pre>
+				<pre>Apellido Paterno:<input type="text" ng-model="a.app" class="form-control"></pre>
+				<pre>Apellido Materno:<input type="text" ng-model="a.apm" class="form-control"></pre>
+				<a href="" ng-click="upd(a)"><img id="{{'rsave'+a._id}}" src="images/save.png" style="float:right;margin:5px 5px 5px 5px;height:22px;width:22px;" data-toggle="tooltip" title="Guardar"/></a>
 				<img src="images/loading_spinner.gif" id="{{'rwait'+a._id}}" style="height:22px;width:22px;display:none;" data-toggle="tooltip" title="Guardar"/>
 			</div>
 		</script>
@@ -71,12 +71,17 @@
 						<div class="8u 12u(mobile)">
 
 							<section class="left-content">
-								<h2>Alumnos de nuevo ingreso por semestre</h2><h3 style="display:inline">( {{currSemYr}} )</h3>
-								
-								<div class="actionBar" ng-show="canAdd">
-									<a href="" ng-click="newA()"><img style="width:25px;height:25px;margin-right:5px;" src="images/add_user.png"/></a>
-                                    <a href="" ng-click="showSearchForm=!showSearchForm"><img style="width:25px;height:25px;margin-right:5px;" src="images/search.png"/></a>
-									<a href="" ng-click="showCsvForm=!showCsvForm"><img style="width:25px;height:25px;margin-right:5px;" src="images/csv.png"/></a>
+								<div ng-show="currSemYr">
+									<h2>Semestre {{currSemYr}}</h2>
+									<select aria-label="ngSelected demo" ng-change="sel1_changed()" ng-model="sel1.selectedValue">
+										<option id="opt1" ng-selected="sel1.selectedValue==0" value="0"><h2>Alumnos inscritos al semestre</h2></option>
+										<option id="opt2" ng-selected="sel1.selectedValue==1" value="1"><h2>Alumnos de nuevo ingreso del semestre</h2></option>
+									</select>
+									<div class="actionBar" ng-show="canAdd">
+										<a href="" ng-click="newA()"><img style="width:25px;height:25px;margin-right:5px;" src="images/add_user.png"/></a>
+										<a href="" ng-click="showSearchForm=!showSearchForm"><img style="width:25px;height:25px;margin-right:5px;" src="images/search.png"/></a>
+										<a href="" ng-click="showCsvForm=!showCsvForm"><img style="width:25px;height:25px;margin-right:5px;" src="images/csv.png"/></a>
+									</div>
 								</div>
                                 <ul class="small-image-list">
                                     <li ng-show="showAddForm">
@@ -84,8 +89,8 @@
 											<pre>Alumno: </pre>
                                             <input type="text" ng-model="a.id" placeholder="Boleta"/> <br/>
                                             <input type="text" ng-model="a.nom" required placeholder="Nombre(s)" capitalize-first/> * <br/>
-											<input type="text" ng-model="a.ap_p" required placeholder="Apellido Paterno" capitalize-first/> * <br/>
-											<input type="text" ng-model="a.ap_m" required placeholder="Apellido Materno" capitalize-first/> * <br/>
+											<input type="text" ng-model="a.app" required placeholder="Apellido Paterno" capitalize-first/> * <br/>
+											<input type="text" ng-model="a.apm" required placeholder="Apellido Materno" capitalize-first/> * <br/>
 											<pre>Carrera: </pre>
 											<select ng-model="mnuCarr" ng-options="a.nom for a in data1.data" /> * <br/>
 											<input type="hidden"/>
@@ -93,7 +98,7 @@
 											<select ng-model="mnuBecas" ng-options="a.nom for a in data2.data" /> * <br/>
 											<input type="hidden"/>
 											<pre>     </pre>
-                                            <input type="submit" ng-click="updateA(a)" value="OK" />
+                                            <input type="submit" ng-click="put(a)" value="OK" />
 											<div class="wait-div"><img class="wait3" src="images/loading_spinner.gif"/></div>
 											<div class="ok-div"><img style="width:30px;height:30px;" class="ok-gif" src="images/check.gif"/></div>
                                         </form>
@@ -129,10 +134,12 @@
 												</tr>
 												<tr ng-repeat="s in b.b.data">
 													<td>
+														<a href="" ng-if="s.scount>=10&&s.out==0"><img style="width:15px;height:15px;" confirmed-click="markOut(s,1)" ng-confirm-click="Marcar como egresado a '{{s.nom}}'? \n NOTA: No se puede deshacer esta acción" ng-src="images/{{s.out==1?'green':'red'}}led.png"/></a>
+														<img style="width:15px;height:15px;" ng-if="s.scount<10||s.out==1" ng-src="images/{{s.out==1?'green':'red'}}led.png"/>
 														<a href=""><img class="delete-gif" style="width:15px;height:15px;" confirmed-click="deleteA(s)" ng-confirm-click="Elminar a '{{s.nombre}}' ?" src="images/delete.png"/></a>
 														<a href="" ng-click="scope(s)" uib-popover-template="dynamicPopover.templateUrl"><img class="edit-gif" style="margin-left:5px;width:15px;height:15px;" src="images/edit.png"/></a>
 													</td>
-													<td style="display:inline;text-align:right;"><h5 style="margin-left:1em">{{'['+s.id+']'}}</h5></td><td><h4 style="margin-left:1em">{{'   ' + s.ap_p + ' ' + s.ap_m + ' ' + s.nombre}}</h4></td>
+													<td style="display:inline;text-align:right;"><h5 style="margin-left:1em">{{'['+s._id+']'}}</h5></td><td style="text-align:right;"><strong style="margin-left:1em">{{s.scount}} sem</strong></td><td><h4 style="margin-left:1em">{{'   ' + s.app + ' ' + s.apm + ' ' + s.nom}}</h4></td>
 												</tr>
 											</table>
 										</li>

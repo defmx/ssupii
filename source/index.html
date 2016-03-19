@@ -107,7 +107,7 @@
 											<ul class="inline">
 												<li><a href="" ng-click="listUsers(s._id)"><span>{{s.nom}}</span></a></li>
 												 ( <li><a href="" ng-click="showEditRoleForm"><img src="images/edit.png" style="height:16px;width:16px;" data-toggle="tooltip" title="Editar"/></a></li>
-												<li><a href="" ng-click="saveRole(s)"><img id="{{'rsave'+s._id}}" src="images/save.png" style="height:18px;width:18px;" data-toggle="tooltip" title="Guardar"/></a></li>
+												<li><a href="" ng-click="waw('PATCH','r',s)"><img id="{{'rsave'+s._id}}" src="images/save.png" style="height:18px;width:18px;" data-toggle="tooltip" title="Guardar"/></a></li>
 												<li><img src="images/loading_spinner.gif" id="{{'rwait'+s._id}}" style="height:18px;width:18px;display:none;" data-toggle="tooltip" title="Guardar"/></li>
 												<li><a href="" ng-click="deleteRole(s)"><img id="{{'rdel'+s._id}}" src="images/delete.png" style="height:16px;width:16px;" data-toggle="tooltip" title="Eliminar"/></a></li>
 												<li><img src="images/loading_spinner.gif" id="{{'rwait2'+s._id}}" style="height:18px;width:18px;display:none;" data-toggle="tooltip" title="Guardar"/></li>
@@ -127,7 +127,7 @@
 								<ul>
 									<li><a href="" ng-click="showAddRoleForm=!showAddRoleForm" style="padding-left:1em;">Agregar</a></li>
 									<li ng-show="showAddRoleForm" class="form">
-										Rol nuevo (  <a href="" ng-click="saveRole(s)"><img id="{{'rsave'+s._id}}" src="images/save.png" style="height:18px;width:18px;" data-toggle="tooltip" title="Guardar"/></a>  )
+										Rol nuevo (  <a href="" ng-click="waw('PUT','r',s)"><img id="{{'rsave'+s._id}}" src="images/save.png" style="height:18px;width:18px;" data-toggle="tooltip" title="Guardar"/></a>  )
 										<input type="text" ng-model="s.nom" size="10" placeholder="nombre"/>
 									</li>
 								</ul>
@@ -146,7 +146,7 @@
 												</li><hr/>
 												<li><a href="" ng-click="showAddUserForm=!showAddUserForm" style="padding-left:1em;">Agregar</a></li>
 												<li ng-show="showAddUserForm" class="form">
-													Usuario nuevo (  <a href="" ng-click="saveUser(s)"><img id="{{'usave'+s._id}}" src="images/save.png" style="height:18px;width:18px;" data-toggle="tooltip" title="Guardar"/></a>  )
+													Usuario nuevo (  <a href="" ng-click="waw('PUT','u',s)"><img id="{{'usave'+s._id}}" src="images/save.png" style="height:18px;width:18px;" data-toggle="tooltip" title="Guardar"/></a>  )
 													<input type="text" ng-model="s._id" size="10" placeholder="id"/>
 													<input type="text" ng-model="s.nom" size="10" placeholder="Nombre"/>
 													<input type="text" ng-model="s.app" size="10" placeholder="Ap Paterno"/>

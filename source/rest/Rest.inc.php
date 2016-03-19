@@ -1,7 +1,5 @@
 <?php
-	/* File : Rest.inc.php
-	 * Author : Arun Kumar Sekar
-	*/
+	
 	class REST {
 		
 		public $_allow = array();
@@ -86,6 +84,10 @@
 					$this->_request = $this->cleanInputs($_GET);
 					break;
 				case "PUT":
+					parse_str(file_get_contents("php://input"),$this->_request);
+					$this->_request = $this->cleanInputs($this->_request);
+					break;
+				case "PATCH":
 					parse_str(file_get_contents("php://input"),$this->_request);
 					$this->_request = $this->cleanInputs($this->_request);
 					break;
