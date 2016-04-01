@@ -32,7 +32,7 @@
 			//Sem-Carr-Beca
 			$this->staQ[]="select concat(convert(calum.yr,char),' - ',convert(calum.sem,char)) as k0 ,ccarr.nom as k1, cbeca.nom as k2,count(1) as v0 from calum join ccarr on calum.cid=ccarr._id join cbeca on calum.bid=cbeca._id where calum.bid>0 group by calum.sem,calum.yr,ccarr.nom,cbeca.nom";
 			//Alumno-Beca
-			$this->stQ[]="SELECT concat(convert(rz00.yr,char),' - ',convert(rz00.sem,char)) as ys,bid FROM rz00 WHERE aid='{aid}' ORDER BY yr,sem";
+			$this->stQ[]="";
 			//Alumno-Beca2
 			$this->stQ[]="SELECT rz00.aid,calum.nom,calum.app,calum.apm,count(1) FROM rz00 join calum on rz00.aid=calum._id group by rz00.aid,rz00.bid having rz00.bid>0";
 		}
@@ -106,9 +106,18 @@
 						return;
 					}
 					if(isset($_REQUEST['n']) && $_REQUEST['n']!=""){
-						$w=$_REQUEST['n'];
-						$this->$func($w);
+						$n=$_REQUEST['n'];
 					}
+					if(isset($_REQUEST['f0']) && $_REQUEST['f0']!=""){
+						$f0=$_REQUEST['f0'];
+					}
+					if(isset($_REQUEST['f1']) && $_REQUEST['f1']!=""){
+						$f1=$_REQUEST['f1'];
+					}
+					if(isset($_REQUEST['f2']) && $_REQUEST['f2']!=""){
+						$f2=$_REQUEST['f2'];
+					}
+					$this->$func($n,$f0,$f1,$f2);
 				}
 				elseif($func=="zzz"){
 					if($this->get_request_method() != "POST"){
@@ -238,7 +247,7 @@
 			foreach($b as $i){
 				$_REQUEST['bid']=$i['bid'];
 				$this->mysqli->query("SET NAMES 'utf8'");
-				$q="SELECT DISTINCT calum._id,calum.nom,calum.app,calum.apm,calum.`out` AS `out`,(SELECT count(1) FROM rz00 WHERE aid=calum._id) as scount,cbeca._id AS bid,cbeca.nom AS bnom,ccarr._id AS cid,ccarr.nom AS cnom FROM calum JOIN cbeca ON calum.bid=cbeca._id JOIN ccarr ON calum.cid=ccarr._id JOIN rz00 ON calum._id=rz00.aid";
+				$q="SELECT DISTINCT calum._id,calum.nom,calum.app,calum.apm,calum.`out` AS `out`,calum.sem,calum.yr,(SELECT count(1) FROM rz00 WHERE aid=calum._id) as scount,cbeca._id AS bid,cbeca.nom AS bnom,ccarr._id AS cid,ccarr.nom AS cnom FROM calum JOIN cbeca ON calum.bid=cbeca._id JOIN ccarr ON calum.cid=ccarr._id JOIN rz00 ON calum._id=rz00.aid";
 				$q.=" WHERE 1=1 ";
 				if(isset($_REQUEST['bid']) && $_REQUEST['bid']!=""){
 					$q=$q." AND calum.bid=".$_REQUEST['bid'];
@@ -515,18 +524,23 @@
 		
 		private function sta($n,$f0,$f1){
 			if($n=="a"){
-				$q="SELECT cbeca._id as bid,cbeca.nom,count(1)-isnull(rz00.bid) as count FROM cbeca left join rz00 on cbeca._id=rz00.bid where sem=$f1 and yr=$f0 group by cbeca._id";
+				$this->sta_a($n,$f0,$f1);
 			}
 			elseif($n=="b"){
-				$q="select cbeca._id as bid,cbeca.nom,count(1) from rz00 join cbeca on rz00.bid=cbeca._id where sem=2 and yr=2014 group by bid";
+				$this->sta_b($n,$f0);
 			}
 			elseif($n=="c"){
 				$i=3;
 			}
 			else{
-				$this->response('UNDEF', 200);
+				$this->response('"UNDEF"', 200);
 				return;
 			}
+			
+		}
+		
+		private function sta_a($n,$f0,$f1){
+			$q="SELECT cbeca._id as bid,cbeca.nom,count(1)-isnull(rz00.bid) as count FROM cbeca left join rz00 on cbeca._id=rz00.bid where sem=$f1 and yr=$f0 group by cbeca._id";
 			$this->mysqli->query("SET NAMES 'utf8'");
 			$r=$this->mysqli->query($q);
 			$h=array();
@@ -563,6 +577,28 @@
 			$this->response($this->json($resp),200);
 		}
 		
+		private function sta_b($n,$f0){
+			$q="select rz00.sem,rz00.yr,count(1) as count from rz00 where rz00.bid=$f0 group by rz00.sem,rz00.yr order by rz00.yr,rz00.sem";
+			$result=array();
+			$obj=new stdClass();
+			$obj->dataPoints=array();
+			$obj->type="spline";
+			$obj->showInLegend=true;
+			$obj->name=$f0;
+			$obj->legendText=$f0;
+			$r=$this->mysqli->query($q);
+			while($row=$r->fetch_assoc()){
+				$obj1=new stdClass();
+				$obj1->label=$row['yr'].'-'.$row['sem'];
+				$obj1->y=intval($row['count']);
+				$obj->dataPoints[]=$obj1;
+			}
+			$result[]=$obj;
+			$resp=array("title"=>"","data"=>$result);
+			$this->response($this->json($resp),200);
+
+		}
+				
 		private function fcsv(){
 			if($this->get_request_method() != "POST"){
 				$this->response('',406);
@@ -684,8 +720,18 @@
 			}
 		}
 		
-		private function stq($s){
-			$q=str_replace("{aid}",$s,$this->stQ[0]);
+		private function stq($n,$f0,$f1,$f2){
+			if($n=="a"){
+				$this->stq_a($f0);
+			}
+			if($n=="c"){
+				$this->stq_c($f0,$f1,$f2);
+			}
+		}
+		
+		private function stq_a($f0){
+			$q="SELECT concat(convert(rz00.yr,char),' - ',convert(rz00.sem,char)) as ys,bid FROM rz00 WHERE aid='{aid}' ORDER BY yr,sem";
+			$q=str_replace("{aid}",$s,$q);
 			$this->mysqli->query("SET NAMES 'utf8'");
 			$r=$this->mysqli->query($q);
 			$dataPoints=array();
@@ -708,6 +754,47 @@
 			$datasub=new stdClass();
 			$datasub->dataPoints=$dataPoints;
 			$datasub->type="spline";
+			$data[]=$datasub;
+			$resp->data=$data;
+			$resp->data=$data;
+			$this->response($this->json($resp),200);
+		}
+		
+		private function stq_c($f0,$f1,$f2){
+			$q="SELECT concat(convert(calum.yri,char),' - ',convert(calum.semi,char)) as ys,calum.`out`,COUNT(1) as c FROM calum WHERE calum.`out` = 1 AND calum.cid = $f0 AND calum.yri=$f1 AND calum.semi=$f2";
+			$q=$q." UNION SELECT concat(convert(calum.yri,char),' - ',convert(calum.semi,char)) as ys,calum.`out`,COUNT(1) as c FROM calum WHERE calum.`out` = 0 AND calum.cid = $f0 AND calum.yri=$f1 AND calum.semi=$f2";
+			$q=str_replace("{aid}",$f0,$q);
+			$this->mysqli->query("SET NAMES 'utf8'");
+			$r=$this->mysqli->query($q);
+			$dataPoints=array();
+			while($row=$r->fetch_assoc()){
+				$sub=new stdClass();
+				$sub->label=$row['out']==1?"Egresado":"Sin egresar";
+				$sub->y=intval($row['c']);
+				$dataPoints[]=$sub;
+			}
+			$ztot=0;
+			foreach($dataPoints as $dp){
+				$ztot+=$dp->y;
+			}
+			foreach($dataPoints as $dp){
+				$dp->y/=$ztot/100;
+				$dp->y=round($dp->y,2);
+			}
+			$resp=new stdClass();
+			$resp->title="";
+			$resp->animationEnabled=true;
+			$axisy=new stdClass();
+			$axisy->interval=1;
+			$axisy->minimum=-1;
+			$axisy->thickness=1;
+			$axisy->gridThickness=1;
+			$resp->axisY=$axisy;
+			$data=array();
+			$datasub=new stdClass();
+			$datasub->dataPoints=$dataPoints;
+			$datasub->type="pie";
+			$datasub->indexLabel="{label} {y} %";
 			$data[]=$datasub;
 			$resp->data=$data;
 			$resp->data=$data;

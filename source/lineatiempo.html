@@ -4,7 +4,6 @@
 		<title>Línea del tiempo por alumno</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
 		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
@@ -23,6 +22,15 @@
 		<script src="assets/js/angular-animate.js"></script>
 		<script src="assets/js/ui-bootstrap-tpls-1.1.2.js"></script>
 		<script src="assets/js/canvasjs.min.js"></script>
+		<script type="text/javascript">
+			var $window = $(window),
+			   $stickyEl = $('#sticky-div'),
+			   elTop = $stickyEl.offset().top;
+
+			$window.scroll(function() {
+				$stickyEl.toggleClass('sticky', $window.scrollTop() > elTop);
+			});
+		</script>
 	</head>
 	<body>
 		<div id="page-wrapper" ng-controller="LINTMPCTRL as ctrl">
@@ -63,15 +71,18 @@
 							<section>
 								<pre>Buscar: </pre><br/>
 								<div>
-									<a href="" ng-click="o1k()"><span>Carrera: </span></a><br/>
-									<select id="input1" ng-model="mnuCarr" ng-options="a.nom for a in data0.data" ng-disabled="!b1" ng-change="o1ch()"/>
+									<a href="" ng-click="o1k();xy2()"><span>Carrera: </span></a><br/>
+									<select id="input1" ng-init="selectedCarr" ng-model="selectedCarr" ng-options="a.nom for a in data0.data" ng-disabled="!b1" ng-change="xy2()"/>
+									<input type="hidden"/>
+									<select id="input2" ng-init="selectedYs" ng-model="selectedYs" ng-options="a.year+' - '+a.sem for a in data2.data" ng-show="b1" ng-change="xy2()"/>
+									<input type="hidden"/>
 									<div class="wait-div"><img id="wait1" style="width:35px;height:35px;" src="images/loading_spinner.gif"/></div>
 								</div>
 								<div class="option">
 									<input type="hidden"/><br/><br/>
 									<a href="" ng-click="o2k()"><span>Alumno: </span></a><br/>
 									<input id="input2" type="text" ng-model="q" ng-disabled="!b2" placeholder="(Boleta, nombre o apellidos)" size="30"/>
-									<input type="submit" ng-click="search(q)" value="OK" />
+									<input type="submit" ng-disabled="!b2" ng-click="search(q)" value="OK" />
 									<div class="wait-div"><img id="wait1" style="width:35px;height:35px;" src="images/loading_spinner.gif"/></div>
 								</div>
 								<ul class="small-image-list">
@@ -88,10 +99,10 @@
 
 
 						</div>
-                        <div class="8u 12u(mobile) important(mobile)"> 
-                            
+                        <div id="sticky-div" class="8u 12u(mobile) important(mobile)"> 
                             <section class="right-content">
                                 <h2>Línea del tiempo</h2>
+								<strong ng-if="b1">Egresados que estuvieron becados de {{selectedCarr.nom}} semestre {{selectedYs.year+' - '+selectedYs.sem}}</strong>
 								<h5>{{a._id}}</h5><h4>{{a.nom + ' ' + a.app + ' ' + a.apm}}</h4>
                                 <div id="chartContainer" style="height: 300px; width: 100%;">
                             </section>

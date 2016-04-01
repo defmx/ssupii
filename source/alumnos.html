@@ -139,7 +139,11 @@
 														<a href=""><img class="delete-gif" style="width:15px;height:15px;" confirmed-click="deleteA(s)" ng-confirm-click="Elminar a '{{s.nombre}}' ?" src="images/delete.png"/></a>
 														<a href="" ng-click="scope(s)" uib-popover-template="dynamicPopover.templateUrl"><img class="edit-gif" style="margin-left:5px;width:15px;height:15px;" src="images/edit.png"/></a>
 													</td>
-													<td style="display:inline;text-align:right;"><h5 style="margin-left:1em">{{'['+s._id+']'}}</h5></td><td style="text-align:right;"><strong style="margin-left:1em">{{s.scount}} sem</strong></td><td><h4 style="margin-left:1em">{{'   ' + s.app + ' ' + s.apm + ' ' + s.nom}}</h4></td>
+													<td style="display:inline;text-align:right;"><h5 style="margin-left:1em">{{'['+s._id+']'}}</h5></td>
+													<td style="text-align:right;"><strong style="margin-left:1em">{{s.scount}} sem</strong></td>
+													<td><strong style="margin-left:1em">{{s.yr+'-'+s.sem}}</strong></td>
+													<td><h4 style="margin-left:1em">{{'   ' + s.app + ' ' + s.apm + ' ' + s.nom}}</h4></td>
+													<td><strong style="margin-left:1em;font-size:.75em;" ng-bind="str_replace(s.cnom,'Ingeniería ','')"></strong></td>
 												</tr>
 											</table>
 										</li>

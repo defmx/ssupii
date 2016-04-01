@@ -146,6 +146,9 @@
 			],
 			selected: 'left'
 		};
+		$scope.str_replace=function(s,r0,r1){
+			return s.replace(r0,r1);
+		};
 		$scope.expandSemList=function(){
 			$scope.semToShow=1000;
 			$('#svwxp').hide();
@@ -418,7 +421,7 @@
 		$('#wait1').hide();
 		$scope.xy=function(a){
 			$scope.a=a;
-			$http.get(endpoint+'?r=stq&n='+a._id+'&sssn='+$scope.sssn.id)
+			$http.get(endpoint+'?r=stq&n=a&f0='+a._id+'&sssn='+$scope.sssn.id)
 				.success(function(data, status, headers, config) {
 					if(status==200){
 						/*var chart = new CanvasJS.Chart("chartContainer"
@@ -490,12 +493,20 @@
 		$http.get(endpoint+'?r=sas&n=c'+'&sssn='+$scope.sssn.id)
 				.success(function(data, status, headers, config) {
 					$scope.data0=data;
+					$scope.selectedCarr=data.data[0];
 				})
 			.error(function(data, status, headers, config) {
 				if(status==401){
 					window.location.replace("index.html");
 				}
 			});
+		$http.get(endpoint+'?r=sab&sssn='+$scope.sssn.id)
+				.success(function(data, status, headers, config) {
+					if(status==200){
+						$scope.data2=data;
+						$scope.selectedYs=data.data[0];
+					}
+				});
 		$scope.search=function(q){
 			$('#wait1').show();
 			if(!q)q='%';
@@ -506,20 +517,22 @@
 						$('#wait1').hide();
 					}
 				});
-		}
+		};
 		$scope.o1k=function(){
 			$scope.b1=!$scope.b1;
 			$scope.b2=false;
-		}
-		$scope.o1ch=function(){
-			$http.get(endpoint+'?r=sas&n=c&q='+q+'&sssn='+$scope.sssn.id)
+			$scope.data1=null;
+			$scope.a=null;
+		};
+		$scope.xy2=function(){
+			$http.get(endpoint+'?r=stq&n=c&f0='+$scope.selectedCarr.cid+'&f1='+$scope.selectedYs.year+'&f2='+$scope.selectedYs.sem+'&sssn='+$scope.sssn.id)
 				.success(function(data, status, headers, config) {
 					if(status==200){
-						$scope.data2=data;
-						$('#wait1').hide();
+						var chart = new CanvasJS.Chart("chartContainer", data);
+						chart.render();
 					}
 				});
-		}
+		};
 		$scope.o2k=function(){
 			$scope.b2=!$scope.b2;
 			$scope.b1=false;

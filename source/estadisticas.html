@@ -4,7 +4,6 @@
 		<title>Estadísticas</title>
 		<meta charset="utf-8" />
 		<meta name="viewport" content="width=device-width, initial-scale=1" />
-		<link href="//netdna.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css" rel="stylesheet">
 		<!--[if lte IE 8]><script src="assets/js/ie/html5shiv.js"></script><![endif]-->
 		<link rel="stylesheet" href="assets/css/main.css" />
 		<!--[if lte IE 9]><link rel="stylesheet" href="assets/css/ie9.css" /><![endif]-->
@@ -77,14 +76,6 @@
 										<ul class="small-image-list" style="padding-left:1em;line-height: 13px;">
 											<li ng-repeat="s in data2.data" style="line-height: 13px;">
 												<a href=""><h4 style="display:inline;font-size:.9em;" ng-click="xy('b',s.bid)">{{s.nom}}</h4></a>
-											</li>
-										</ul>
-                                    </li>
-                                    <li>
-                                        <a href="" ng-click="g3()"><h4>Por carrera</h4></a>
-										<ul class="small-image-list" style="padding-left:1em;line-height: 13px;">
-											<li ng-repeat="s in data3.data" style="line-height: 13px;">
-												<a href=""><h4 style="display:inline;font-size:.9em;" ng-click="xy('c',s.cid)">{{s.nom}}</h4></a>
 											</li>
 										</ul>
                                     </li>
