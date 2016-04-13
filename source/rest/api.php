@@ -108,12 +108,15 @@
 					if(isset($_REQUEST['n']) && $_REQUEST['n']!=""){
 						$n=$_REQUEST['n'];
 					}
+					$f0=null;
 					if(isset($_REQUEST['f0']) && $_REQUEST['f0']!=""){
 						$f0=$_REQUEST['f0'];
 					}
+					$f1=null;
 					if(isset($_REQUEST['f1']) && $_REQUEST['f1']!=""){
 						$f1=$_REQUEST['f1'];
 					}
+					$f2=null;
 					if(isset($_REQUEST['f2']) && $_REQUEST['f2']!=""){
 						$f2=$_REQUEST['f2'];
 					}
@@ -247,7 +250,7 @@
 			foreach($b as $i){
 				$_REQUEST['bid']=$i['bid'];
 				$this->mysqli->query("SET NAMES 'utf8'");
-				$q="SELECT DISTINCT calum._id,calum.nom,calum.app,calum.apm,calum.`out` AS `out`,calum.sem,calum.yr,(SELECT count(1) FROM rz00 WHERE aid=calum._id) as scount,cbeca._id AS bid,cbeca.nom AS bnom,ccarr._id AS cid,ccarr.nom AS cnom FROM calum JOIN cbeca ON calum.bid=cbeca._id JOIN ccarr ON calum.cid=ccarr._id JOIN rz00 ON calum._id=rz00.aid";
+				$q="SELECT DISTINCT calum._id,calum._id as id0,calum.nom,calum.app,calum.apm,calum.`out` AS `out`,calum.sem,calum.yr,(SELECT count(1) FROM rz00 WHERE aid=calum._id) as scount,cbeca._id AS bid,cbeca.nom AS bnom,ccarr._id AS cid,ccarr.nom AS cnom FROM calum JOIN cbeca ON calum.bid=cbeca._id JOIN ccarr ON calum.cid=ccarr._id JOIN rz00 ON calum._id=rz00.aid";
 				$q.=" WHERE 1=1 ";
 				if(isset($_REQUEST['bid']) && $_REQUEST['bid']!=""){
 					$q=$q." AND calum.bid=".$_REQUEST['bid'];
@@ -263,7 +266,7 @@
 					}
 				}
 				if($f){
-					$q=$q." AND (calum._id LIKE '%$f%' OR calum.nom LIKE '%$f%' OR calum.app LIKE '%$f%' OR calum.apm LIKE '%$f%')";
+					$q=$q." AND (calum._id LIKE '%$f%' OR calum.nom LIKE '%$f%' OR calum.app LIKE '%$f%' OR calum.apm LIKE '%$f%' OR concat(calum.app,' ',calum.apm,' ',calum.nom) LIKE '%$f%')";
 				}
 				$q=$q." ORDER BY cbeca._id,calum.app,calum.apm";
 				$r=$this->mysqli->query($q);
@@ -364,35 +367,49 @@
 				$this->waw_u($data,$action);
 				return;
 			}
-			if(isset($data['id']) && $data['id']!=""){
-				$id=$data['id'];
+			elseif($w&&$w=="a"){
+				$this->waw_a($data,$action);
+				return;
+			}
+		}
+		
+		private function waw_a($data,$action){
+			if(isset($data['_id']) && $data['_id']!=""){
+				$id=$data['_id'];
 			}
 			else{
 				$id="uuid()";
 			}
+			$fcount=0;
 			$id0=null;
 			if(isset($data['id0']) && $data['id0']!=""){$id0=$data['id0'];}
 			$nom=null;
-			if(isset($data['nom']) && $data['nom']!=""){$nom=$data['nom'];}
+			if(isset($data['nom']) && $data['nom']!=""){$nom=$data['nom'];$fcount++;}
 			$app=null;
-			if(isset($data['app']) && $data['app']!=""){$app=$data['app'];}
+			if(isset($data['app']) && $data['app']!=""){$app=$data['app'];$fcount++;}
 			$apm=null;
-			if(isset($data['apm']) && $data['apm']!=""){$apm=$data['apm'];}
+			if(isset($data['apm']) && $data['apm']!=""){$apm=$data['apm'];$fcount++;}
 			$bid=null;
-			if(isset($data['bid']) && $data['bid']!=""){$bid=$data['bid'];}
+			if(isset($data['bid']) && $data['bid']!=""){$bid=$data['bid'];$fcount++;}
 			$cid=null;
-			if(isset($data['cid']) && $data['cid']!=""){$cid=$data['cid'];}
+			if(isset($data['cid']) && $data['cid']!=""){$cid=$data['cid'];$fcount++;}
 			$out=null;
-			if(isset($data['out']) && $data['out']!=""){$out=$data['out'];}
+			if(isset($data['out']) && $data['out']!=""){$out=$data['out'];$fcount++;}
 			$yr=null;
-			if(isset($data['yr']) && $data['yr']!=""){$yr=$data['yr'];}
+			if(isset($data['yr']) && $data['yr']!=""){$yr=$data['yr'];$fcount++;}
 			$sem=null;
-			if(isset($data['sem']) && $data['sem']!=""){$sem=$data['sem'];}
+			if(isset($data['sem']) && $data['sem']!=""){$sem=$data['sem'];$fcount++;}
 			if($action=="PATCH") {
 				if($id0&&$id0!==$id){
 					//For table 'rz00' the update is done by a fk cascade
 					$q="UPDATE calum SET _id='$id' WHERE _id='$id0'";
 					$this->mysqli->query($q);
+				}
+				if($this->mysqli->error){
+					$this->response(json_encode($this->mysqli->error),400);
+				}
+				elseif($fcount==0){
+					$this->response("",200);
 				}
 				$q="UPDATE calum SET ";
 				if($nom) $q=$q."nom='".$nom."',";
@@ -700,7 +717,7 @@
 		}
 		
 		private function seek($s){
-			$q="SELECT calum.* FROM calum WHERE _id LIKE '%{q}%' OR nom LIKE '%{q}%' OR app LIKE '%{q}%' OR apm LIKE '%{q}%' ORDER BY calum.app,calum.apm,calum.nom";
+			$q="SELECT calum.* FROM calum WHERE _id LIKE '%{q}%' OR nom LIKE '%{q}%' OR app LIKE '%{q}%' OR apm LIKE '%{q}%' OR concat(app,' ',apm,' ',nom) LIKE '%{q}%' ORDER BY calum.app,calum.apm,calum.nom";
 			$s=str_replace("'",null,$s);
 			$q=str_replace("{q}",$s,$q);
 			$r=$this->mysqli->query("SET NAMES 'utf8'");
@@ -731,7 +748,7 @@
 		
 		private function stq_a($f0){
 			$q="SELECT concat(convert(rz00.yr,char),' - ',convert(rz00.sem,char)) as ys,bid FROM rz00 WHERE aid='{aid}' ORDER BY yr,sem";
-			$q=str_replace("{aid}",$s,$q);
+			$q=str_replace("{aid}",$f0,$q);
 			$this->mysqli->query("SET NAMES 'utf8'");
 			$r=$this->mysqli->query($q);
 			$dataPoints=array();

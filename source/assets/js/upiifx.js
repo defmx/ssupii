@@ -285,7 +285,6 @@
 		}
 		$scope.scope=function(a){
 			$scope.a=a;
-			$scope.a.id0=a.id;
 		}
 		$scope.submitCsv=function(){
 			$('.wait3').show();
